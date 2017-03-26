@@ -14,6 +14,8 @@ defmodule ASN.CTT do
   Record.defrecord :comptype, :ComponentType, Record.extract(:ComponentType, from_lib: @asn1_hrl)
   Record.defrecord :extaddgroup, :ExtensionAdditionGroup, Record.extract(:ExtensionAdditionGroup, from_lib: @asn1_hrl)
 
+  # --------------------------------------------------------------------------
+
   def asn_type_use(db) do
     Enum.reduce(db, %{}, fn
       {type, typedef(name: type) = tdef}, tref -> tref_typedef(tdef, tref)
@@ -102,6 +104,18 @@ defmodule ASN.CTT do
 
   defp inckey(map, key) do
     map |> Map.put_new(key, 0) |> update_in([key], &(&1 + 1))
+  end
+
+  # --------------------------------------------------------------------------
+
+  def asn_type_kind(db) do
+    for {type, typedef(name: type, typespec: spec)} <- db, into: %{} do
+      type(def: defn) = spec
+      case defn do
+        rec when tuple_size(rec) > 1 -> {type, elem(rec, 0)}
+        basic when is_atom(basic) -> {type, basic}
+      end
+    end
   end
 
   # --------------------------------------------------------------------------

@@ -20,7 +20,7 @@ defmodule AsnCttTest do
 
   test "CTT.asn_type_kind/1" do
     assert is_map(db = RRC.db)
-    type_kind = CTT.asn_type_kind(RRC.db)
+    type_kind = CTT.asn_type_kind(db)
     kind_used =
       type_kind
       |> Map.values
@@ -53,6 +53,38 @@ defmodule AsnCttTest do
                            :"VarMobilityHistoryReport-r12",
                            :"VarShortMAC-Input-NB-r13",
                            :"VarShortResumeMAC-Input-NB-r13"]
+  end
+
+  test "ASN.CTT.asn_roots/1" do
+    assert is_map(db = RRC.db)
+    assert CTT.asn_roots(db) == [
+      :"BCCH-BCH-Message", :"BCCH-BCH-Message-NB", :"BCCH-DL-SCH-Message",
+      :"BCCH-DL-SCH-Message-BR", :"BCCH-DL-SCH-Message-NB", :"CHARACTER STRING",
+      :"DL-CCCH-Message", :"DL-CCCH-Message-NB", :"DL-DCCH-Message",
+      :"DL-DCCH-Message-NB", :"EMBEDDED PDV", :EXTERNAL, :HandoverCommand,
+      :HandoverPreparationInformation, :"HandoverPreparationInformation-NB",
+      :"HandoverPreparationInformation-v9j0-IEs", :"MCCH-Message", :"PCCH-Message",
+      :"PCCH-Message-NB", :"RRCConnectionReconfiguration-v8m0-IEs",
+      :"RRCConnectionRelease-v9e0-IEs", :"SBCCH-SL-BCH-Message",
+      :"SC-MCCH-Message-r13", :"SCG-ConfigInfo-r12", :"SL-Preconfiguration-r12",
+      :"SL-V2X-Preconfiguration-r14", :"SystemInformationBlockType1-v8h0-IEs",
+      :"SystemInformationBlockType2-v8h0-IEs",
+      :"SystemInformationBlockType3-v10j0-IEs",
+      :"SystemInformationBlockType5-v8h0-IEs",
+      :"SystemInformationBlockType6-v8h0-IEs", :"UE-EUTRA-Capability",
+      :"UE-EUTRA-Capability-v10j0-IEs", :"UE-EUTRA-Capability-v9a0-IEs",
+      :"UEInformationResponse-v9e0-IEs", :UEPagingCoverageInformation,
+      :"UEPagingCoverageInformation-NB", :UERadioAccessCapabilityInformation,
+      :"UERadioAccessCapabilityInformation-NB", :UERadioPagingInformation,
+      :"UERadioPagingInformation-NB", :"UL-CCCH-Message", :"UL-CCCH-Message-NB",
+      :"UL-DCCH-Message", :"UL-DCCH-Message-NB", :"VarConnEstFailReport-r11",
+      :"VarLogMeasConfig-r10", :"VarLogMeasConfig-r11", :"VarLogMeasConfig-r12",
+      :"VarLogMeasReport-r10", :"VarLogMeasReport-r11", :VarMeasConfig,
+      :VarMeasReportList, :"VarMeasReportList-r12", :"VarMobilityHistoryReport-r12",
+      :"VarRLF-Report-r10", :"VarRLF-Report-r11", :"VarShortMAC-Input-NB-r13",
+      :"VarShortResumeMAC-Input-NB-r13", :"VarWLAN-MobilityConfig",
+      :"VarWLAN-Status-r13"
+    ]
   end
 
 end

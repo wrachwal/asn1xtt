@@ -114,13 +114,36 @@ defmodule ASN.CTT do
   # --------------------------------------------------------------------------
 
   def asn_type_kind(db) do
-    for {type, typedef(name: type, typespec: spec)} <- db, into: %{} do
-      type(def: defn) = spec
-      case defn do
-        rec when tuple_size(rec) > 1 -> {type, elem(rec, 0)}
-        basic when is_atom(basic) -> {type, basic}
-      end
+    for {type, typedef()} <- db, into: %{} do
+      {type, asn_type_kind(db, type)}
     end
+  end
+
+  def asn_type_kind(db, type) do
+    typedef(name: ^type, typespec: spec) = db[type]
+    type(def: def) = spec
+    case def do
+      rec when tuple_size(rec) > 1 -> elem(rec, 0)
+      basic when is_atom(basic) -> basic
+    end
+  end
+
+  # --------------------------------------------------------------------------
+
+  def kind_mapping(:"BIT STRING"), do: :scalar
+  def kind_mapping(:BOOLEAN), do: :scalar
+  def kind_mapping(:CHOICE), do: :record
+  def kind_mapping(:ENUMERATED), do: :scalar
+  def kind_mapping(:Externaltypereference), do: :typedef
+  def kind_mapping(:INTEGER), do: :scalar
+  def kind_mapping(:"OCTET STRING"), do: :scalar
+  def kind_mapping(:SEQUENCE), do: :record
+  def kind_mapping(:"SEQUENCE OF"), do: :list
+
+  def asn_roots(db) do
+    for {type, 1} <- asn_type_use(db), not kind_mapping(asn_type_kind(db, type)) in [:scalar] do
+      type
+    end |> Enum.sort()
   end
 
   # --------------------------------------------------------------------------

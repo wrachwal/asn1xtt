@@ -4,15 +4,20 @@ defmodule ASN.CTT do
 
   @venc :__version_and_erule__
 
-  Record.defrecord :typedef, Record.extract(:typedef, from_lib: @asn1_hrl)
-  Record.defrecord :valuedef, Record.extract(:valuedef, from_lib: @asn1_hrl)
-  Record.defrecord :classdef, Record.extract(:classdef, from_lib: @asn1_hrl)
-  Record.defrecord :module, Record.extract(:module, from_lib: @asn1_hrl)
-  Record.defrecord :type, Record.extract(:type, from_lib: @asn1_hrl)
-  Record.defrecord :sequence, :SEQUENCE, Record.extract(:SEQUENCE, from_lib: @asn1_hrl)
-  Record.defrecord :extyperef, :Externaltypereference, Record.extract(:Externaltypereference, from_lib: @asn1_hrl)
-  Record.defrecord :comptype, :ComponentType, Record.extract(:ComponentType, from_lib: @asn1_hrl)
-  Record.defrecord :extaddgroup, :ExtensionAdditionGroup, Record.extract(:ExtensionAdditionGroup, from_lib: @asn1_hrl)
+  asn1_records = Record.extract_all(from_lib: @asn1_hrl)
+
+  for {rec, tag} <- %{typedef: nil,
+                      valuedef: nil,
+                      classdef: nil,
+                      module: nil,
+                      type: nil,
+                      SEQUENCE: :sequence,
+                      Externaltypereference: :extyperef,
+                      ComponentType: :comptype,
+                      ExtensionAdditionGroup: :extaddgroup,
+                    } do
+    Record.defrecord tag || rec, rec, asn1_records[rec]
+  end
 
   # --------------------------------------------------------------------------
 

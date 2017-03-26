@@ -37,6 +37,15 @@ defmodule ASN.CTT do
     tref_def(def, tref)
   end
 
+  defp tref_def(:INTEGER, tref), do: tref
+  defp tref_def(:"OCTET STRING", tref), do: tref
+  defp tref_def(:BOOLEAN, tref), do: tref
+  defp tref_def(:NULL, tref), do: tref
+  defp tref_def(:"OBJECT IDENTIFIER", tref), do: tref
+  defp tref_def(:"ObjectDescriptor", tref), do: tref
+  defp tref_def(:ANY, tref), do: tref
+  defp tref_def({:ENUMERATED, _}, tref), do: tref
+  defp tref_def({:"BIT STRING", _}, tref), do: tref
   defp tref_def(sequence(components: comps, extaddgroup: :undefined), tref) do
     tref_components(tref, comps)
   end
@@ -46,9 +55,6 @@ defmodule ASN.CTT do
   defp tref_def({:"SEQUENCE OF", type() = type}, tref) do
     tref_typespec(type, tref)
   end
-  defp tref_def(:INTEGER, tref) do
-    tref
-  end
   defp tref_def({:CHOICE, comps}, tref) when is_list(comps) do
     tref_components(tref, comps)
   end
@@ -57,30 +63,6 @@ defmodule ASN.CTT do
   end
   defp tref_def(extyperef(type: type), tref) do
     inckey(tref, type)
-  end
-  defp tref_def({:ENUMERATED, _}, tref) do
-    tref
-  end
-  defp tref_def({:"BIT STRING", _}, tref) do
-    tref
-  end
-  defp tref_def(:"OCTET STRING", tref) do
-    tref
-  end
-  defp tref_def(:BOOLEAN, tref) do
-    tref
-  end
-  defp tref_def(:NULL, tref) do
-    tref
-  end
-  defp tref_def(:"OBJECT IDENTIFIER", tref) do
-    tref
-  end
-  defp tref_def(:"ObjectDescriptor", tref) do
-    tref
-  end
-  defp tref_def(:ANY, tref) do
-    tref
   end
 
   defp tref_components(tref, {comps, exts}) when is_list(comps) and is_list(exts) do
@@ -97,14 +79,10 @@ defmodule ASN.CTT do
     tref
   end
 
+  defp tref_comp(tref, extaddgroup()), do: tref
+  defp tref_comp(tref, :ExtensionAdditionGroupEnd), do: tref
   defp tref_comp(tref, comptype(typespec: spec)) do
     tref_typespec(spec, tref)
-  end
-  defp tref_comp(tref, extaddgroup()) do
-    tref
-  end
-  defp tref_comp(tref, :ExtensionAdditionGroupEnd) do
-    tref
   end
 
   defp inckey(map, key) do

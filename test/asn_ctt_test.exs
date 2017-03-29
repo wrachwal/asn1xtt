@@ -87,4 +87,17 @@ defmodule AsnCttTest do
     ]
   end
 
+  test "search_field/5 - goal starting with root" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:MasterInformationBlock), [:MasterInformationBlock, :"phich-Config"], [], []) ==
+      [{[], ["phich-Config": 2]}, # final result
+       {[:"phich-Config"], []}] # partial result
+  end
+
+  test "search_field/5 - goal without root" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:MasterInformationBlock), [:"phich-Config"], [], []) ==
+      [{[], ["phich-Config": 2]}] # final result
+  end
+
 end

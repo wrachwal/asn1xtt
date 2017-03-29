@@ -126,6 +126,39 @@ defmodule ASN.CTT do
 
   # --------------------------------------------------------------------------
 
+  def search_field(db, node, goal, path, acc)
+
+  def search_field(_db, _node, [], _pl, acc), do: acc
+  def search_field(db, typedef(name: gh, typespec: spec), [gh | gt], pl, acc),
+    do: search_field(db, spec, gt, pl, [{gt, pl} | acc])
+  def search_field(db, typedef(name: _, typespec: spec), gl, pl, acc),
+    do: search_field(db, spec, gl, pl, acc)
+  def search_field(db, type(def: def), gl, pl, acc),
+    do: search_field(db, def, gl, pl, acc)
+  def search_field(db, sequence(components: comps, extaddgroup: :undefined), gl, pl, acc),
+    do: search_components(db, comps, gl, pl, acc)
+  def search_field(db, sequence(components: comps, extaddgroup: exts), gl, pl, acc),
+    do: search_components(db, exts, gl, pl, search_components(db, comps, gl, pl, acc))
+  def search_field(_db, :INTEGER, _gl, _pl, acc), do: acc
+  def search_field(_db, {:ENUMERATED, _}, _gl, _pl, acc), do: acc
+  def search_field(_db, {:"BIT STRING", _}, _gl, _pl, acc), do: acc
+
+  defp search_components(db, {comps, exts}, gl, pl, acc),
+    do: search_comps_list(db, exts, gl, pl, search_comps_list(db, comps, gl, pl, acc))
+  defp search_components(db, comps, gl, pl, acc) when is_list(comps),
+    do: search_comps_list(db, comps, gl, pl, acc)
+
+  defp search_comps_list(db, [comp | comps], gl, pl, acc),
+    do: search_comps_list(db, comps, gl, pl, search_comp(db, comp, gl, pl, acc))
+  defp search_comps_list(_db, [], _gl, _pl, acc), do: acc
+
+  defp search_comp(db, comptype(name: gh, typespec: spec, textual_order: ei), [gh | gt], pl, acc),
+    do: search_field(db, spec, gt, [{gh, ei} | pl], [{gt, [{gh, ei} | pl]} | acc])
+  defp search_comp(db, comptype(name: en, typespec: spec, textual_order: ei), gl, pl, acc),
+    do: search_field(db, spec, gl, [{en, ei} | pl], acc)
+
+  # --------------------------------------------------------------------------
+
   def dump_to_file(db, file) do
     db = Enum.sort(db)
     File.open!(file, [:write, :exclusive], fn device ->

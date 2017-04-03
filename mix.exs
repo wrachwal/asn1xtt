@@ -1,9 +1,9 @@
-defmodule AsnCtt.Mixfile do
+defmodule Asn1xtt.Mixfile do
   use Mix.Project
 
   def project do
     [
-      app: :asn_ctt,
+      app: :asn1xtt,
       version: "0.1.0",
       elixir: "~> 1.5-dev",
       start_permanent: Mix.env == :prod,

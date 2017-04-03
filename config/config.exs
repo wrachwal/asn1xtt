@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :asn_ctt, key: :value
+#     config :asn1xtt, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:asn_ctt, :key)
+#     Application.get_env(:asn1xtt, :key)
 #
 # Or configure a 3rd-party app:
 #

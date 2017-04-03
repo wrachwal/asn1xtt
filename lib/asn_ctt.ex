@@ -129,6 +129,9 @@ defmodule ASN.CTT do
   @list :LIST
   @alt  :ALT
 
+  @scalar1 [:INTEGER, :BOOLEAN, :"OCTET STRING", :NULL]
+  @scalar2 [:ENUMERATED, :"BIT STRING"]
+
   def search_field(db, node, goal, path, acc)
 
   def search_field(_db, _node, [], _pl, acc), do: acc
@@ -138,22 +141,18 @@ defmodule ASN.CTT do
     do: search_field(db, spec, gl, pl, acc)
   def search_field(db, type(def: def), gl, pl, acc),
     do: search_field(db, def, gl, pl, acc)
+  def search_field(db, extyperef(type: type), gl, pl, acc) when is_atom(type),
+    do: search_field(db, db.(type), gl, pl, acc)
   def search_field(db, sequence(components: comps, extaddgroup: :undefined), gl, pl, acc),
     do: search_components(db, comps, gl, pl, acc)
   def search_field(db, sequence(components: comps, extaddgroup: exts), gl, pl, acc),
     do: search_components(db, exts, gl, pl, search_components(db, comps, gl, pl, acc))
-  def search_field(_db, :INTEGER, _gl, _pl, acc), do: acc
-  def search_field(_db, {:ENUMERATED, _}, _gl, _pl, acc), do: acc
-  def search_field(_db, {:"BIT STRING", _}, _gl, _pl, acc), do: acc
-  def search_field(db, extyperef(type: type), gl, pl, acc) when is_atom(type),
-    do: search_field(db, db.(type), gl, pl, acc)
   def search_field(db, {:CHOICE, comps}, gl, pl, acc),
     do: search_components(db, comps, gl, pl, acc)
   def search_field(db, {:"SEQUENCE OF", type() = type}, gl, pl, acc),
     do: search_field(db, type, gl, [@list | pl], acc)
-  def search_field(_db, :BOOLEAN, _gl, _pl, acc), do: acc
-  def search_field(_db, :NULL, _gl, _pl, acc), do: acc
-  def search_field(_db, :"OCTET STRING", _gl, _pl, acc), do: acc
+  def search_field(_db, {scalar, _}, _gl, _pl, acc) when scalar in @scalar2, do: acc
+  def search_field(_db, scalar, _gl, _pl, acc) when scalar in @scalar1, do: acc
 
   defp search_components(db, {comps, exts}, gl, pl, acc),
     do: search_comps_list(db, exts, gl, pl, search_comps_list(db, comps, gl, pl, acc))

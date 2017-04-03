@@ -100,4 +100,63 @@ defmodule AsnCttTest do
       [{[], ["phich-Config": 2]}] # final result
   end
 
+  test "search_field/5 - CHOICE field starting with root" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"BCCH-DL-SCH-Message", :systemInformationBlockType1], [], []) ==
+      [{[], [systemInformationBlockType1: :ALT, c1: :ALT, message: 1]}, # final result
+       {[:systemInformationBlockType1], []}]                          # partial result
+  end
+
+  test "search_field/5 - CHOICE field without root" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:systemInformationBlockType1], [], []) ==
+      [{[], [systemInformationBlockType1: :ALT, c1: :ALT, message: 1]}] # final result
+  end
+
+  test "search_field/5 - CHOICE field, given by type, without root" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:SystemInformationBlockType1], [], []) ==
+      [{[], [systemInformationBlockType1: :ALT, c1: :ALT, message: 1]}] # final result
+  end
+
+  test "search_field/5 - field name, nested inside SEQUENCE OF" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"plmn-Identity"], [], []) ==
+      [{[],
+        [{:"plmn-Identity", 1},
+         :LIST,
+         {:"plmn-IdentityList", 1},
+         {:cellAccessRelatedInfo, 1},
+         {:systemInformationBlockType1, :ALT},
+         {:c1, :ALT},
+         {:message, 1}]}]
+  end
+
+  test "search_field/5 - field given by type (ambiguous result), nested inside SEQUENCE OF" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"PLMN-Identity"], [], []) ==
+      [{[], # final result #1
+        [{:"plmn-Identity", 1},
+         :LIST,
+         {:"plmn-IdentityList", 1},
+         {:cellAccessRelatedInfo, 1},
+         {:systemInformationBlockType1, :ALT},
+         {:c1, :ALT},
+         {:message, 1}]},
+       {[], # final result #2
+        [{:"plmnIdentity-r12", :ALT},
+         :LIST,
+         {:"plmn-IdentityList-r12", 2},
+         :LIST,
+         {:"discInterFreqList-r12", 2},
+         {:"sib19-v1250", :ALT},
+         :LIST,
+         {:"sib-TypeAndInfo", 1},
+         {:"systemInformation-r8", :ALT},
+         {:criticalExtensions, 1},
+         {:systemInformation, :ALT},
+         {:c1, :ALT},
+         {:message, 1}]}]
+  end
+
 end

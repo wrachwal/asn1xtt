@@ -126,6 +126,9 @@ defmodule ASN.CTT do
 
   # --------------------------------------------------------------------------
 
+  @list :LIST
+  @alt  :ALT
+
   def search_field(db, node, goal, path, acc)
 
   def search_field(_db, _node, [], _pl, acc), do: acc
@@ -142,6 +145,15 @@ defmodule ASN.CTT do
   def search_field(_db, :INTEGER, _gl, _pl, acc), do: acc
   def search_field(_db, {:ENUMERATED, _}, _gl, _pl, acc), do: acc
   def search_field(_db, {:"BIT STRING", _}, _gl, _pl, acc), do: acc
+  def search_field(db, extyperef(type: type), gl, pl, acc) when is_atom(type),
+    do: search_field(db, db.(type), gl, pl, acc)
+  def search_field(db, {:CHOICE, comps}, gl, pl, acc),
+    do: search_components(db, comps, gl, pl, acc)
+  def search_field(db, {:"SEQUENCE OF", type() = type}, gl, pl, acc),
+    do: search_field(db, type, gl, [@list | pl], acc)
+  def search_field(_db, :BOOLEAN, _gl, _pl, acc), do: acc
+  def search_field(_db, :NULL, _gl, _pl, acc), do: acc
+  def search_field(_db, :"OCTET STRING", _gl, _pl, acc), do: acc
 
   defp search_components(db, {comps, exts}, gl, pl, acc),
     do: search_comps_list(db, exts, gl, pl, search_comps_list(db, comps, gl, pl, acc))
@@ -152,10 +164,17 @@ defmodule ASN.CTT do
     do: search_comps_list(db, comps, gl, pl, search_comp(db, comp, gl, pl, acc))
   defp search_comps_list(_db, [], _gl, _pl, acc), do: acc
 
-  defp search_comp(db, comptype(name: gh, typespec: spec, textual_order: ei), [gh | gt], pl, acc),
-    do: search_field(db, spec, gt, [{gh, ei} | pl], [{gt, [{gh, ei} | pl]} | acc])
+  defp search_comp(db, comptype(name: gh, typespec: spec, textual_order: ei), [gh | gt], pl, acc) do
+    pl_new = [{gh, textual_order(ei)} | pl]
+    search_field(db, spec, gt, pl_new, [{gt, pl_new} | acc])
+  end
   defp search_comp(db, comptype(name: en, typespec: spec, textual_order: ei), gl, pl, acc),
-    do: search_field(db, spec, gl, [{en, ei} | pl], acc)
+    do: search_field(db, spec, gl, [{en, textual_order(ei)} | pl], acc)
+  defp search_comp(_db, extaddgroup(), _gl, _pl, acc), do: acc
+  defp search_comp(_db, :ExtensionAdditionGroupEnd, _gl, _pl, acc), do: acc
+
+  defp textual_order(pos) when is_integer(pos), do: pos
+  defp textual_order(:undefined), do: @alt
 
   # --------------------------------------------------------------------------
 

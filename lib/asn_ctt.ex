@@ -132,27 +132,29 @@ defmodule ASN.CTT do
   @scalar1 [:INTEGER, :BOOLEAN, :"OCTET STRING", :NULL]
   @scalar2 [:ENUMERATED, :"BIT STRING"]
 
-  def search_field(db, node, goal, path, acc)
+  def search_field(db, node, goal) do
+    search_field(db, node, goal, [], [])
+  end
 
-  def search_field(_db, _node, [], _pl, acc), do: acc
-  def search_field(db, typedef(name: gh, typespec: spec), [gh | gt], pl, acc),
+  defp search_field(_db, _node, [], _pl, acc), do: acc
+  defp search_field(db, typedef(name: gh, typespec: spec), [gh | gt], pl, acc),
     do: search_field(db, spec, gt, pl, [{gt, pl} | acc])
-  def search_field(db, typedef(name: _, typespec: spec), gl, pl, acc),
+  defp search_field(db, typedef(name: _, typespec: spec), gl, pl, acc),
     do: search_field(db, spec, gl, pl, acc)
-  def search_field(db, type(def: def), gl, pl, acc),
+  defp search_field(db, type(def: def), gl, pl, acc),
     do: search_field(db, def, gl, pl, acc)
-  def search_field(db, extyperef(type: type), gl, pl, acc) when is_atom(type),
+  defp search_field(db, extyperef(type: type), gl, pl, acc) when is_atom(type),
     do: search_field(db, db.(type), gl, pl, acc)
-  def search_field(db, sequence(components: comps, extaddgroup: :undefined), gl, pl, acc),
+  defp search_field(db, sequence(components: comps, extaddgroup: :undefined), gl, pl, acc),
     do: search_components(db, comps, gl, pl, acc)
-  def search_field(db, sequence(components: comps, extaddgroup: exts), gl, pl, acc),
+  defp search_field(db, sequence(components: comps, extaddgroup: exts), gl, pl, acc),
     do: search_components(db, exts, gl, pl, search_components(db, comps, gl, pl, acc))
-  def search_field(db, {:CHOICE, comps}, gl, pl, acc),
+  defp search_field(db, {:CHOICE, comps}, gl, pl, acc),
     do: search_components(db, comps, gl, pl, acc)
-  def search_field(db, {:"SEQUENCE OF", type() = type}, gl, pl, acc),
+  defp search_field(db, {:"SEQUENCE OF", type() = type}, gl, pl, acc),
     do: search_field(db, type, gl, [@list | pl], acc)
-  def search_field(_db, {scalar, _}, _gl, _pl, acc) when scalar in @scalar2, do: acc
-  def search_field(_db, scalar, _gl, _pl, acc) when scalar in @scalar1, do: acc
+  defp search_field(_db, {scalar, _}, _gl, _pl, acc) when scalar in @scalar2, do: acc
+  defp search_field(_db, scalar, _gl, _pl, acc) when scalar in @scalar1, do: acc
 
   defp search_components(db, {comps, exts}, gl, pl, acc),
     do: search_comps_list(db, exts, gl, pl, search_comps_list(db, comps, gl, pl, acc))

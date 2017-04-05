@@ -90,217 +90,232 @@ defmodule AsnCttTest do
   test "search_field/3 - goal starting with root" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:MasterInformationBlock), [:MasterInformationBlock, :"phich-Config"]) ==
-      [{[], ["phich-Config": 2]}, # final result
-       {[:"phich-Config"], []}] # partial result
+      [{[],
+        [{:"phich-Config", 2, :mandatory}]},
+       {[:"phich-Config"],
+        []}]
   end
 
   test "search_field/3 - goal without root" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:MasterInformationBlock), [:"phich-Config"]) ==
-      [{[], ["phich-Config": 2]}] # final result
+      [{[],
+        [{:"phich-Config", 2, :mandatory}]}]
   end
 
   test "search_field/3 - CHOICE field starting with root" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"BCCH-DL-SCH-Message", :systemInformationBlockType1]) ==
-      [{[], [systemInformationBlockType1: :ALT, c1: :ALT, message: 1]}, # final result
-       {[:systemInformationBlockType1], []}]                          # partial result
+      [{[],
+        [{:systemInformationBlockType1, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
+       {[:systemInformationBlockType1],
+        []}]
   end
 
   test "search_field/3 - CHOICE field without root" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:systemInformationBlockType1]) ==
-      [{[], [systemInformationBlockType1: :ALT, c1: :ALT, message: 1]}] # final result
+      [{[],
+        [{:systemInformationBlockType1, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 - CHOICE field, given by type, without root" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:SystemInformationBlockType1]) ==
-      [{[], [systemInformationBlockType1: :ALT, c1: :ALT, message: 1]}] # final result
+      [{[],
+        [{:systemInformationBlockType1, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 - field name, nested inside SEQUENCE OF" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"plmn-Identity"]) ==
       [{[],
-        [{:"plmn-Identity", 1},
+        [{:"plmn-Identity", 1, :mandatory},
          :LIST,
-         {:"plmn-IdentityList", 1},
-         {:cellAccessRelatedInfo, 1},
-         {:systemInformationBlockType1, :ALT},
-         {:c1, :ALT},
-         {:message, 1}]}]
+         {:"plmn-IdentityList", 1, :mandatory},
+         {:cellAccessRelatedInfo, 1, :mandatory},
+         {:systemInformationBlockType1, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 - field given by type (ambiguous result), nested inside SEQUENCE OF" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"PLMN-Identity"]) ==
       [{[], # final result #1
-        [{:"plmn-Identity", 1},
+        [{:"plmn-Identity", 1, :mandatory},
          :LIST,
-         {:"plmn-IdentityList", 1},
-         {:cellAccessRelatedInfo, 1},
-         {:systemInformationBlockType1, :ALT},
-         {:c1, :ALT},
-         {:message, 1}]},
+         {:"plmn-IdentityList", 1, :mandatory},
+         {:cellAccessRelatedInfo, 1, :mandatory},
+         {:systemInformationBlockType1, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[], # final result #2
-        [{:"plmnIdentity-r12", :ALT},
+        [{:"plmnIdentity-r12", :ALT, :mandatory},
          :LIST,
-         {:"plmn-IdentityList-r12", 2},
+         {:"plmn-IdentityList-r12", 2, :OPTIONAL},
          :LIST,
-         {:"discInterFreqList-r12", 2},
-         {:"sib19-v1250", :ALT},
+         {:"discInterFreqList-r12", 2, :OPTIONAL},
+         {:"sib19-v1250", :ALT, :mandatory},
          :LIST,
-         {:"sib-TypeAndInfo", 1},
-         {:"systemInformation-r8", :ALT},
-         {:criticalExtensions, 1},
-         {:systemInformation, :ALT},
-         {:c1, :ALT},
-         {:message, 1}]}]
+         {:"sib-TypeAndInfo", 1, :mandatory},
+         {:"systemInformation-r8", :ALT, :mandatory},
+         {:criticalExtensions, 1, :mandatory},
+         {:systemInformation, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 -- :bucketSizeDuration, 3 final results (goals)" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"DL-DCCH-Message"), [:RRCConnectionReconfiguration, :bucketSizeDuration]) ==
       [{[],
-        [{:bucketSizeDuration, 3},
-         {:"ul-SpecificParameters", 1},
-         {:"logicalChannelConfigSCG-r12", 6},
+        [{:bucketSizeDuration, 3, :mandatory},
+         {:"ul-SpecificParameters", 1, :OPTIONAL},
+         {:"logicalChannelConfigSCG-r12", 6, :OPTIONAL},
          :LIST,
-         {:"drb-ToAddModListSCG-r12", 1},
-         {:"radioResourceConfigDedicatedSCG-r12", 1},
-         {:"scg-ConfigPartSCG-r12", 2},
-         {:setup, :ALT},
-         {:"scg-Configuration-r12", 2},
-         {:nonCriticalExtension, 2},
-         {:nonCriticalExtension, 3},
-         {:nonCriticalExtension, 3},
-         {:nonCriticalExtension, 2},
-         {:nonCriticalExtension, 6},
-         {:"rrcConnectionReconfiguration-r8", :ALT},
-         {:c1, :ALT},
-         {:criticalExtensions, 2},
-         {:rrcConnectionReconfiguration, :ALT},
-         {:c1, :ALT},
-         {:message, 1}]},
+         {:"drb-ToAddModListSCG-r12", 1, :OPTIONAL},
+         {:"radioResourceConfigDedicatedSCG-r12", 1, :OPTIONAL},
+         {:"scg-ConfigPartSCG-r12", 2, :OPTIONAL},
+         {:setup, :ALT, :mandatory},
+         {:"scg-Configuration-r12", 2, :OPTIONAL},
+         {:nonCriticalExtension, 2, :OPTIONAL},
+         {:nonCriticalExtension, 3, :OPTIONAL},
+         {:nonCriticalExtension, 3, :OPTIONAL},
+         {:nonCriticalExtension, 2, :OPTIONAL},
+         {:nonCriticalExtension, 6, :OPTIONAL},
+         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[],
-        [{:bucketSizeDuration, 3},
-         {:"ul-SpecificParameters", 1},
-         {:logicalChannelConfig, 6},
+        [{:bucketSizeDuration, 3, :mandatory},
+         {:"ul-SpecificParameters", 1, :OPTIONAL},
+         {:logicalChannelConfig, 6, :OPTIONAL},
          :LIST,
-         {:"drb-ToAddModList", 2},
-         {:radioResourceConfigDedicated, 4},
-         {:"rrcConnectionReconfiguration-r8", :ALT},
-         {:c1, :ALT},
-         {:criticalExtensions, 2},
-         {:rrcConnectionReconfiguration, :ALT},
-         {:c1, :ALT},
-         {:message, 1}]},
+         {:"drb-ToAddModList", 2, :OPTIONAL},
+         {:radioResourceConfigDedicated, 4, :OPTIONAL},
+         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[],
-        [{:bucketSizeDuration, 3},
-         {:"ul-SpecificParameters", 1},
-         {:explicitValue, :ALT},
-         {:logicalChannelConfig, 3},
+        [{:bucketSizeDuration, 3, :mandatory},
+         {:"ul-SpecificParameters", 1, :OPTIONAL},
+         {:explicitValue, :ALT, :mandatory},
+         {:logicalChannelConfig, 3, :OPTIONAL},
          :LIST,
-         {:"srb-ToAddModList", 1},
-         {:radioResourceConfigDedicated, 4},
-         {:"rrcConnectionReconfiguration-r8", :ALT},
-         {:c1, :ALT},
-         {:criticalExtensions, 2},
-         {:rrcConnectionReconfiguration, :ALT},
-         {:c1, :ALT},
-         {:message, 1}]},
+         {:"srb-ToAddModList", 1, :OPTIONAL},
+         {:radioResourceConfigDedicated, 4, :OPTIONAL},
+         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[:bucketSizeDuration],
-         [rrcConnectionReconfiguration: :ALT, c1: :ALT, message: 1]}]
+         [{:rrcConnectionReconfiguration, :ALT, :mandatory},
+          {:c1, :ALT, :mandatory},
+          {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 -- :bucketSizeDuration, 2 final results (goals)" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"DL-DCCH-Message"), [:"drb-ToAddModList", :bucketSizeDuration]) ==
       [{[],
-        [{:bucketSizeDuration, 3},
-         {:"ul-SpecificParameters", 1},
-         {:logicalChannelConfig, 6},
+        [{:bucketSizeDuration, 3, :mandatory},
+         {:"ul-SpecificParameters", 1, :OPTIONAL},
+         {:logicalChannelConfig, 6, :OPTIONAL},
          :LIST,
-         {:"drb-ToAddModList", 2},
-         {:"radioResourceConfigDedicated-r13", 1},
-         {:"rrcConnectionResume-r13", :ALT},
-         {:c1, :ALT},
-         {:criticalExtensions, 2},
-         {:"rrcConnectionResume-r13", :ALT},
-         {:c1, :ALT},
-         {:message, 1}]},
+         {:"drb-ToAddModList", 2, :OPTIONAL},
+         {:"radioResourceConfigDedicated-r13", 1, :OPTIONAL},
+         {:"rrcConnectionResume-r13", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:"rrcConnectionResume-r13", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[:bucketSizeDuration],
-         ["drb-ToAddModList": 2,
-          "radioResourceConfigDedicated-r13": 1,
-          "rrcConnectionResume-r13": :ALT,
-          c1: :ALT,
-          criticalExtensions: 2,
-          "rrcConnectionResume-r13": :ALT,
-          c1: :ALT,
-          message: 1]},
+         [{:"drb-ToAddModList", 2, :OPTIONAL},
+          {:"radioResourceConfigDedicated-r13", 1, :OPTIONAL},
+          {:"rrcConnectionResume-r13", :ALT, :mandatory},
+          {:c1, :ALT, :mandatory},
+          {:criticalExtensions, 2, :mandatory},
+          {:"rrcConnectionResume-r13", :ALT, :mandatory},
+          {:c1, :ALT, :mandatory},
+          {:message, 1, :mandatory}]},
        {[],
-        [{:bucketSizeDuration, 3},
-         {:"ul-SpecificParameters", 1},
-         {:logicalChannelConfig, 6},
+        [{:bucketSizeDuration, 3, :mandatory},
+         {:"ul-SpecificParameters", 1, :OPTIONAL},
+         {:logicalChannelConfig, 6, :OPTIONAL},
          :LIST,
-         {:"drb-ToAddModList", 2},
-         {:radioResourceConfigDedicated, 4},
-         {:"rrcConnectionReconfiguration-r8", :ALT},
-         {:c1, :ALT},
-         {:criticalExtensions, 2},
-         {:rrcConnectionReconfiguration, :ALT},
-         {:c1, :ALT},
-         {:message, 1}]},
+         {:"drb-ToAddModList", 2, :OPTIONAL},
+         {:radioResourceConfigDedicated, 4, :OPTIONAL},
+         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[:bucketSizeDuration],
-        ["drb-ToAddModList": 2,
-         radioResourceConfigDedicated: 4,
-         "rrcConnectionReconfiguration-r8": :ALT,
-         c1: :ALT,
-         criticalExtensions: 2,
-         rrcConnectionReconfiguration: :ALT,
-         c1: :ALT,
-         message: 1]}]
+        [{:"drb-ToAddModList", 2, :OPTIONAL},
+         {:radioResourceConfigDedicated, 4, :OPTIONAL},
+         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 -- :bucketSizeDuration, 1 final result (goal)" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"DL-DCCH-Message"), [:RRCConnectionReconfiguration, :"drb-ToAddModList", :bucketSizeDuration]) ==
       [{[],
-        [{:bucketSizeDuration, 3},
-         {:"ul-SpecificParameters", 1},
-         {:logicalChannelConfig, 6},
+        [{:bucketSizeDuration, 3, :mandatory},
+         {:"ul-SpecificParameters", 1, :OPTIONAL},
+         {:logicalChannelConfig, 6, :OPTIONAL},
          :LIST,
-         {:"drb-ToAddModList", 2},
-         {:radioResourceConfigDedicated, 4},
-         {:"rrcConnectionReconfiguration-r8", :ALT},
-         {:c1, :ALT},
-         {:criticalExtensions, 2},
-         {:rrcConnectionReconfiguration, :ALT},
-         {:c1, :ALT},
-         {:message, 1}]},
+         {:"drb-ToAddModList", 2, :OPTIONAL},
+         {:radioResourceConfigDedicated, 4, :OPTIONAL},
+         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[:bucketSizeDuration],
-        ["drb-ToAddModList": 2,
-         radioResourceConfigDedicated: 4,
-         "rrcConnectionReconfiguration-r8": :ALT,
-         c1: :ALT,
-         criticalExtensions: 2,
-         rrcConnectionReconfiguration: :ALT,
-         c1: :ALT,
-         message: 1]},
+        [{:"drb-ToAddModList", 2, :OPTIONAL},
+         {:radioResourceConfigDedicated, 4, :OPTIONAL},
+         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[:"drb-ToAddModList", :bucketSizeDuration],
-        [rrcConnectionReconfiguration: :ALT,
-         c1: :ALT,
-         message: 1]}]
+        [{:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 in types that have defines like BCCH-BCH-MessageType ::= MasterInformationBlock" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:"BCCH-BCH-Message"), [:"phich-Duration"]) ==
-      [{[], # ------- field  in record
-        ["phich-Duration": 1, # PHICH-Config
-         "phich-Config": 2,   # MasterInformationBlock
-         message: 1]}]        # BCCH-BCH-Message
+      [{[], # ----------------------- field  in record
+        [{:"phich-Duration", 1, :mandatory},  # PHICH-Config
+         {:"phich-Config", 2, :mandatory},    # MasterInformationBlock
+         {:message, 1, :mandatory}]}]         # BCCH-BCH-Message
   end
 
 end

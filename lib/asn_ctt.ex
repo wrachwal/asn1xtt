@@ -165,14 +165,18 @@ defmodule ASN.CTT do
     do: search_comps_list(db, comps, gl, pl, search_comp(db, comp, gl, pl, acc))
   defp search_comps_list(_db, [], _gl, _pl, acc), do: acc
 
-  defp search_comp(db, comptype(name: gh, typespec: spec, textual_order: ei), [gh | gt], pl, acc) do
-    pl_new = [{gh, textual_order(ei)} | pl]
+  defp search_comp(db, comptype(name: gh, typespec: spec, prop: prop, textual_order: ei), [gh | gt], pl, acc) do
+    pl_new = [{gh, textual_order(ei), prop(prop)} | pl]
     search_field(db, spec, gt, pl_new, [{gt, pl_new} | acc])
   end
-  defp search_comp(db, comptype(name: en, typespec: spec, textual_order: ei), gl, pl, acc),
-    do: search_field(db, spec, gl, [{en, textual_order(ei)} | pl], acc)
+  defp search_comp(db, comptype(name: en, typespec: spec, prop: prop, textual_order: ei), gl, pl, acc),
+    do: search_field(db, spec, gl, [{en, textual_order(ei), prop(prop)} | pl], acc)
   defp search_comp(_db, extaddgroup(), _gl, _pl, acc), do: acc
   defp search_comp(_db, :ExtensionAdditionGroupEnd, _gl, _pl, acc), do: acc
+
+  defp prop(:mandatory), do: :mandatory
+  defp prop(:OPTIONAL), do: :OPTIONAL
+  defp prop({:DEFAULT, _} = default), do: default
 
   defp textual_order(pos) when is_integer(pos), do: pos
   defp textual_order(:undefined), do: @alt

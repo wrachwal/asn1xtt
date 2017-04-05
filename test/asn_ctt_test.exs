@@ -159,4 +159,148 @@ defmodule AsnCttTest do
          {:message, 1}]}]
   end
 
+  test "search_field/5 -- :bucketSizeDuration, 3 final results (goals)" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"DL-DCCH-Message"), [:RRCConnectionReconfiguration, :bucketSizeDuration], [], []) ==
+      [{[],
+        [{:bucketSizeDuration, 3},
+         {:"ul-SpecificParameters", 1},
+         {:"logicalChannelConfigSCG-r12", 6},
+         :LIST,
+         {:"drb-ToAddModListSCG-r12", 1},
+         {:"radioResourceConfigDedicatedSCG-r12", 1},
+         {:"scg-ConfigPartSCG-r12", 2},
+         {:setup, :ALT},
+         {:"scg-Configuration-r12", 2},
+         {:nonCriticalExtension, 2},
+         {:nonCriticalExtension, 3},
+         {:nonCriticalExtension, 3},
+         {:nonCriticalExtension, 2},
+         {:nonCriticalExtension, 6},
+         {:"rrcConnectionReconfiguration-r8", :ALT},
+         {:c1, :ALT},
+         {:criticalExtensions, 2},
+         {:rrcConnectionReconfiguration, :ALT},
+         {:c1, :ALT},
+         {:message, 1}]},
+       {[],
+        [{:bucketSizeDuration, 3},
+         {:"ul-SpecificParameters", 1},
+         {:logicalChannelConfig, 6},
+         :LIST,
+         {:"drb-ToAddModList", 2},
+         {:radioResourceConfigDedicated, 4},
+         {:"rrcConnectionReconfiguration-r8", :ALT},
+         {:c1, :ALT},
+         {:criticalExtensions, 2},
+         {:rrcConnectionReconfiguration, :ALT},
+         {:c1, :ALT},
+         {:message, 1}]},
+       {[],
+        [{:bucketSizeDuration, 3},
+         {:"ul-SpecificParameters", 1},
+         {:explicitValue, :ALT},
+         {:logicalChannelConfig, 3},
+         :LIST,
+         {:"srb-ToAddModList", 1},
+         {:radioResourceConfigDedicated, 4},
+         {:"rrcConnectionReconfiguration-r8", :ALT},
+         {:c1, :ALT},
+         {:criticalExtensions, 2},
+         {:rrcConnectionReconfiguration, :ALT},
+         {:c1, :ALT},
+         {:message, 1}]},
+       {[:bucketSizeDuration],
+         [rrcConnectionReconfiguration: :ALT, c1: :ALT, message: 1]}]
+  end
+
+  test "search_field/5 -- :bucketSizeDuration, 2 final results (goals)" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"DL-DCCH-Message"), [:"drb-ToAddModList", :bucketSizeDuration], [], []) ==
+      [{[],
+        [{:bucketSizeDuration, 3},
+         {:"ul-SpecificParameters", 1},
+         {:logicalChannelConfig, 6},
+         :LIST,
+         {:"drb-ToAddModList", 2},
+         {:"radioResourceConfigDedicated-r13", 1},
+         {:"rrcConnectionResume-r13", :ALT},
+         {:c1, :ALT},
+         {:criticalExtensions, 2},
+         {:"rrcConnectionResume-r13", :ALT},
+         {:c1, :ALT},
+         {:message, 1}]},
+       {[:bucketSizeDuration],
+         ["drb-ToAddModList": 2,
+          "radioResourceConfigDedicated-r13": 1,
+          "rrcConnectionResume-r13": :ALT,
+          c1: :ALT,
+          criticalExtensions: 2,
+          "rrcConnectionResume-r13": :ALT,
+          c1: :ALT,
+          message: 1]},
+       {[],
+        [{:bucketSizeDuration, 3},
+         {:"ul-SpecificParameters", 1},
+         {:logicalChannelConfig, 6},
+         :LIST,
+         {:"drb-ToAddModList", 2},
+         {:radioResourceConfigDedicated, 4},
+         {:"rrcConnectionReconfiguration-r8", :ALT},
+         {:c1, :ALT},
+         {:criticalExtensions, 2},
+         {:rrcConnectionReconfiguration, :ALT},
+         {:c1, :ALT},
+         {:message, 1}]},
+       {[:bucketSizeDuration],
+        ["drb-ToAddModList": 2,
+         radioResourceConfigDedicated: 4,
+         "rrcConnectionReconfiguration-r8": :ALT,
+         c1: :ALT,
+         criticalExtensions: 2,
+         rrcConnectionReconfiguration: :ALT,
+         c1: :ALT,
+         message: 1]}]
+  end
+
+  test "search_field/5 -- :bucketSizeDuration, 1 final result (goal)" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"DL-DCCH-Message"), [:RRCConnectionReconfiguration, :"drb-ToAddModList", :bucketSizeDuration], [], []) ==
+      [{[],
+        [{:bucketSizeDuration, 3},
+         {:"ul-SpecificParameters", 1},
+         {:logicalChannelConfig, 6},
+         :LIST,
+         {:"drb-ToAddModList", 2},
+         {:radioResourceConfigDedicated, 4},
+         {:"rrcConnectionReconfiguration-r8", :ALT},
+         {:c1, :ALT},
+         {:criticalExtensions, 2},
+         {:rrcConnectionReconfiguration, :ALT},
+         {:c1, :ALT},
+         {:message, 1}]},
+       {[:bucketSizeDuration],
+        ["drb-ToAddModList": 2,
+         radioResourceConfigDedicated: 4,
+         "rrcConnectionReconfiguration-r8": :ALT,
+         c1: :ALT,
+         criticalExtensions: 2,
+         rrcConnectionReconfiguration: :ALT,
+         c1: :ALT,
+         message: 1]},
+       {[:"drb-ToAddModList", :bucketSizeDuration],
+        [rrcConnectionReconfiguration: :ALT,
+         c1: :ALT,
+         message: 1]}]
+  end
+
+  test "search_field/5 in types that have defines like BCCH-BCH-MessageType ::= MasterInformationBlock" do
+    db = &RRC.db/1
+    assert CTT.search_field(db, db.(:"BCCH-BCH-Message"), [:"phich-Duration"], [], []) ==
+      [{[], # ------- field  in record
+        ["phich-Duration": 1, # PHICH-Config
+         "phich-Config": 2,   # MasterInformationBlock
+         message: 1]}]        # BCCH-BCH-Message
+  end
+
 end

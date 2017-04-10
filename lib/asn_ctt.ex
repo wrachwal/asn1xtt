@@ -21,6 +21,41 @@ defmodule ASN.CTT do
 
   # --------------------------------------------------------------------------
 
+  defmacro burn_asn1db(asn1db) do
+    quote bind_quoted: [asn1db: asn1db] do
+      require Record
+      kv_list = ASN.CTT.__asn1db_kv(asn1db)
+      Enum.each kv_list, fn {k, v} ->
+        is_atom(k) or raise "not atom key #{inspect k} has value #{inspect v}"
+        v = Macro.escape(v)
+        def db(unquote(k)), do: unquote(v)
+      end
+    end
+  end
+
+  @doc false
+  def __asn1db_kv(asn1db) do
+    {:ok, tab} = :ets.file2tab(String.to_charlist(asn1db))
+    tab_kv = :ets.tab2list(tab)
+    kind_map = Enum.reduce(tab_kv, %{}, &asn1db_reduce_kv/2)
+    tab_kv = [{:__asn1db__, kind_map |> Map.keys() |> Enum.sort()} | tab_kv]
+    for {kind, keys} <- kind_map, into: tab_kv do
+      {kind, Enum.reverse(keys)}
+    end
+  end
+
+  defp asn1db_reduce_kv({k, typedef()}, map), do: asn1db_put_kind(map, :__typedef__, k)
+  defp asn1db_reduce_kv({k, valuedef()}, map), do: asn1db_put_kind(map, :__valuedef__, k)
+  defp asn1db_reduce_kv({k, _}, map), do: asn1db_put_kind(map, k, k)
+
+  defp asn1db_put_kind(map, kind, k) do
+    map
+    |> Map.put_new(kind, [])
+    |> update_in([kind], &([k | &1]))
+  end
+
+  # --------------------------------------------------------------------------
+
   def asn_type_use(db) do
     Enum.reduce(db, %{}, fn
       {type, typedef(name: type) = tdef}, tref -> tref_typedef(tref, tdef)

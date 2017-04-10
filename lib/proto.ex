@@ -2,47 +2,25 @@ defmodule Proto do
 
   #####################################
 
-  def show(mode, {:getf, _meta, [fld]} = node, acc) do
-    IO.puts "-- #{mode} | gf #{inspect fld}"
-    {node, acc}
+  def conv({:getf, meta, [f]}, data, type) when is_atom(f) do
+    IO.puts "gf #{inspect f}"
+    {:getf, meta, [data, type, f]}
   end
-  def show(mode, {:with_msg, _meta, [d, t, _]} = node, acc) do
-    IO.puts "-- #{mode} | wm (#{Macro.to_string(d)}, #{inspect t})"
-    {node, acc}
+  def conv({:with_msg, meta, [data, type, [do: block]]}, _data, _type) do
+    IO.puts "wm (#{Macro.to_string(data)}, #{inspect type})"
+    {:with_msg, meta, [data, type, [do: conv(block, data, type)]]}
   end
-  def show(_mode, node, acc), do: {node, acc}
-
-  #####################################
-
-  def conv(mode, {:getf, meta, [f]}, [{d, t} | _] = acc) do
-    IO.puts "-- #{mode} | gf #{inspect f}"
-    {{:getf, meta, [d, t, f]}, acc}
-  end
-  def conv(:pre, {:with_msg, _meta, [d, t, _]} = ast, acc) do
-    IO.puts "-- pre | wm (#{Macro.to_string(d)}, #{inspect t})"
-    {ast, [{d, t} | acc]}
-  end
-  def conv(:post, {:with_msg, _meta, [d, t, _]} = ast, acc) do
-    IO.puts "-- post | wm (#{Macro.to_string(d)}, #{inspect t})"
-    {ast, tl(acc)}
-  end
-  def conv(_mode, ast, acc) do
-    {ast, acc}
+  def conv(ast, _data, _type) do
+    ast
   end
 
   #####################################
 
   defmacro with_msg(data, type, do: block) when is_atom(type) do
-    ast =
-      quote do
-        var!(with_msg, Proto) = true
-        unquote(block)
-      end
-    IO.puts "============== #{inspect type}"
-
-  # {ast, _acc} = Macro.traverse(ast, {data, type}, &show(" PRE", &1, &2), &show("POST", &1, &2))
-    {ast, _acc} = Macro.traverse(ast, [{data, type}], &conv(:pre, &1, &2), &conv(:post, &1, &2))
-    ast
+    quote do
+      var!(with_msg, Proto) = true
+      unquote(Macro.prewalk(block, &conv(&1, data, type)))
+    end
   end
   defmacro getf(name) when is_atom(name) do
     quote do
@@ -85,34 +63,12 @@ defmodule TestProto do
   end
 end
 
-################################################# traverse (show) ############
-# ============== :msgA
-# --  PRE | gf :a1
-# -- POST | gf :a1
-# --  PRE | wm (pduB, :msgB)
-# --  PRE | gf :b
-# -- POST | gf :b
-# -- POST | wm (pduB, :msgB)
-# --  PRE | gf :a2
-# -- POST | gf :a2
-# ============== :msgB
-# --  PRE | gf :b
-# -- POST | gf :b
-# iex(100)> TestProto.test 333
-# __getf ~~> :a1
-# __getf ~~> :b
-# __getf ~~> :a2
-# 333
-
-################################################# traverse (conv) ############
-# ============== :msgA
-# -- pre | gf :a1
-# -- pre | wm (pduB, :msgB)
-# -- pre | gf :b
-# -- post | wm (pduB, :msgB)
-# -- pre | gf :a2
-# ============== :msgB
-# iex(28)> TestProto.test 333
+################################################# prewalk/2 ##################
+# gf :a1
+# wm (pduB, :msgB)
+# gf :b
+# gf :a2
+# iex(1)> TestProto.test 333
 # __getf(%{a: 1, b: 2} | :msgA |:a1
 # __getf(%{b: 2, c: 3} | :msgB |:b
 # __getf(%{a: 1, b: 2} | :msgA |:a2

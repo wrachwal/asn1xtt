@@ -1,8 +1,8 @@
-EUTRA-RRC-Definitions.asn
-PC5-RRC-Definitions.asn
-EUTRA-UE-Variables.asn
-EUTRA-Sidelink-Preconf.asn
-EUTRA-InterNodeDefinitions.asn
-NBIOT-RRC-Definitions.asn
-NBIOT-UE-Variables.asn
-NBIOT-InterNodeDefinitions.asn
+../asn/EUTRA-RRC-Definitions.asn
+../asn/PC5-RRC-Definitions.asn
+../asn/EUTRA-UE-Variables.asn
+../asn/EUTRA-Sidelink-Preconf.asn
+../asn/EUTRA-InterNodeDefinitions.asn
+../asn/NBIOT-RRC-Definitions.asn
+../asn/NBIOT-UE-Variables.asn
+../asn/NBIOT-InterNodeDefinitions.asn

@@ -3,14 +3,8 @@ defmodule AsnCttTest do
 
   alias ASN.CTT
 
-  test "RRC.db/0" do
-    assert is_map(db = RRC.db)
-    assert map_size(db) == 1704
-  end
-
   test "CTT.asn_type_use/1" do
-    assert is_map(db = RRC.db)
-    assert is_map(cnt = CTT.asn_type_use(db))
+    assert is_map(cnt = CTT.asn_type_use(&RRC.db/1))
     assert map_size(cnt) == 1569
     singles = cnt |> Enum.filter(fn {_, v} -> v == 1 end) |> Keyword.keys
     assert length(singles) == 238
@@ -19,8 +13,7 @@ defmodule AsnCttTest do
   end
 
   test "CTT.asn_type_kind/1" do
-    assert is_map(db = RRC.db)
-    type_kind = CTT.asn_type_kind(db)
+    type_kind = CTT.asn_type_kind(&RRC.db/1)
     kind_used =
       type_kind
       |> Map.values
@@ -56,8 +49,7 @@ defmodule AsnCttTest do
   end
 
   test "ASN.CTT.asn_roots/1" do
-    assert is_map(db = RRC.db)
-    assert CTT.asn_roots(db) == [
+    assert CTT.asn_roots(&RRC.db/1) == [
       :"BCCH-BCH-Message", :"BCCH-BCH-Message-NB", :"BCCH-DL-SCH-Message",
       :"BCCH-DL-SCH-Message-BR", :"BCCH-DL-SCH-Message-NB", :"CHARACTER STRING",
       :"DL-CCCH-Message", :"DL-CCCH-Message-NB", :"DL-DCCH-Message",

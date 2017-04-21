@@ -66,8 +66,10 @@ defmodule ASN.CTT do
 
   # --------------------------------------------------------------------------
 
-  def asn_type_use(db) do
-    Enum.reduce(db, %{}, fn
+  def asn_type_use(db) when is_function(db, 1) do
+    db.(:__typedef__)
+    |> Enum.map(&{&1, db.(&1)})
+    |> Enum.reduce(%{}, fn
       {type, typedef(name: type) = tdef}, tref -> tref_typedef(tref, tdef)
       {_, rec}, tref when elem(rec, 0) in [:valuedef, :classdef, :module] -> tref
       {@venc, _}, tref -> tref
@@ -136,16 +138,16 @@ defmodule ASN.CTT do
 
   # --------------------------------------------------------------------------
 
-  def asn_type_kind(db) do
-    for {type, typedef()} <- db, into: %{} do
-      {type, asn_type_kind(db, type)}
-    end
+  def asn_type_kind(db) when is_function(db, 1) do
+    db.(:__typedef__)
+    |> Enum.map(&{&1, asn_type_kind(db, &1)})
+    |> Map.new
   end
 
   def asn_type_kind(db, type) do
-    typedef(name: ^type, typespec: spec) = db[type]
-    type(def: def) = spec
-    case def do
+    typedef(name: ^type, typespec: spec) = db.(type)
+    type(def: tdef) = spec
+    case tdef do
       rec when tuple_size(rec) > 1 -> elem(rec, 0)
       basic when is_atom(basic) -> basic
     end
@@ -163,7 +165,7 @@ defmodule ASN.CTT do
   def kind_mapping(:SEQUENCE), do: :record
   def kind_mapping(:"SEQUENCE OF"), do: :list
 
-  def asn_roots(db) do
+  def asn_roots(db) when is_function(db, 1) do
     for {type, 1} <- asn_type_use(db), not kind_mapping(asn_type_kind(db, type)) in [:scalar] do
       type
     end |> Enum.sort()
@@ -227,17 +229,5 @@ defmodule ASN.CTT do
   defp textual_order(:undefined), do: @alt
 
   # --------------------------------------------------------------------------
-
-  def dump_to_file(db, file) do
-    db = Enum.sort(db)
-    File.open!(file, [:write, :exclusive], fn device ->
-      for {type, typedef(name: type) = obj} <- db do
-        IO.puts device, "===="
-        IO.inspect device, obj, limit: 100_000
-      end
-      :ok
-    end)
-    {:ok, file, length(db)}
-  end
 
 end

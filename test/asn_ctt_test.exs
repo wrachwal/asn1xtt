@@ -232,9 +232,9 @@ defmodule AsnCttTest do
          {:c1, :ALT, :mandatory},
          {:message, 1, :mandatory}]},
        {[:bucketSizeDuration],
-         [{:rrcConnectionReconfiguration, :ALT, :mandatory},
-          {:c1, :ALT, :mandatory},
-          {:message, 1, :mandatory}]}]
+        [{:rrcConnectionReconfiguration, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 -- :bucketSizeDuration, 2 final results (goals)" do
@@ -254,14 +254,14 @@ defmodule AsnCttTest do
          {:c1, :ALT, :mandatory},
          {:message, 1, :mandatory}]},
        {[:bucketSizeDuration],
-         [{:"drb-ToAddModList", 2, :OPTIONAL},
-          {:"radioResourceConfigDedicated-r13", 1, :OPTIONAL},
-          {:"rrcConnectionResume-r13", :ALT, :mandatory},
-          {:c1, :ALT, :mandatory},
-          {:criticalExtensions, 2, :mandatory},
-          {:"rrcConnectionResume-r13", :ALT, :mandatory},
-          {:c1, :ALT, :mandatory},
-          {:message, 1, :mandatory}]},
+        [{:"drb-ToAddModList", 2, :OPTIONAL},
+         {:"radioResourceConfigDedicated-r13", 1, :OPTIONAL},
+         {:"rrcConnectionResume-r13", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:criticalExtensions, 2, :mandatory},
+         {:"rrcConnectionResume-r13", :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
        {[],
         [{:bucketSizeDuration, 3, :mandatory},
          {:"ul-SpecificParameters", 1, :OPTIONAL},

@@ -1,7 +1,7 @@
 defmodule AsnCttTest do
   use ExUnit.Case
 
-  alias ASN.{CTT, RRC}
+  alias ASN.CTT
 
   test "RRC.db/0" do
     assert is_map(db = RRC.db)

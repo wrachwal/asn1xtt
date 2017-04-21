@@ -6,9 +6,17 @@ defmodule Asn1xtt.Mixfile do
       app: :asn1xtt,
       version: "0.1.0",
       elixir: "~> 1.5-dev",
+      elixirc_paths: elixirc_paths(Mix.env),
       start_permanent: Mix.env == :prod,
       deps: deps()
     ]
+  end
+
+  defp elixirc_paths(env) when env in [:dev, :test] do
+    ["3gpp/lib", "lib"]
+  end
+  defp elixirc_paths(_env) do
+    ["lib"]
   end
 
   # Run "mix help compile.app" to learn about applications.
@@ -21,7 +29,7 @@ defmodule Asn1xtt.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:asn_rrc,  path: "asn/asn_rrc", only: [:dev, :test]}
+      {:asn_rrc,  path: "3gpp/asn/asn_rrc", only: [:dev, :test]}
     ]
   end
 end

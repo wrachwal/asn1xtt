@@ -6,7 +6,8 @@ defmodule ASN.CTT do
 
   asn1_records = Record.extract_all(from_lib: @asn1_hrl)
 
-  for {rec, tag} <- %{typedef: nil,
+  for {rec, tag} <- %{module: nil,
+                      typedef: nil,
                       valuedef: nil,
                       classdef: nil,
                       module: nil,
@@ -39,8 +40,17 @@ defmodule ASN.CTT do
     tab_kv = :ets.tab2list(tab)
     kind_map = Enum.reduce(tab_kv, %{}, &asn1db_reduce_kv/2)
     tab_kv = [{:__asn1db__, kind_map |> Map.keys() |> Enum.sort()} | tab_kv]
+    {types, values, [], [], [], []} = module(tab_kv[:MODULE], :typeorval)
+    typeord = types |> Enum.reverse() |> Enum.with_index |> Map.new
+    valueord = values |> Enum.reverse() |> Enum.with_index |> Map.new
     for {kind, keys} <- kind_map, into: tab_kv do
-      {kind, Enum.reverse(keys)}
+      keys =
+        case kind do
+          :__typedef__ -> keys |> Enum.sort(&(typeord[&1] <= typeord[&2]))
+          :__valuedef__ -> keys |> Enum.sort(&(valueord[&1] <= valueord[&2]))
+          _other -> keys |> Enum.reverse()
+        end
+      {kind, keys}
     end
   end
 

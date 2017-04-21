@@ -87,6 +87,22 @@ defmodule AsnCttTest do
     ]
   end
 
+  test "__typedef__ and __valuedef__ are in order as in .asn" do
+    assert Enum.take(RRC.db(:__typedef__), 6) == [
+        :"BCCH-BCH-Message",
+        :"BCCH-BCH-MessageType",
+        :"BCCH-DL-SCH-Message",
+        :"BCCH-DL-SCH-MessageType",
+        :"BCCH-DL-SCH-Message-BR",
+        :"BCCH-DL-SCH-MessageType-BR-r13",
+      ]
+    assert Enum.take(RRC.db(:__valuedef__), 3) == [
+        :"maxACDC-Cat-r13",
+        :"maxAvailNarrowBands-r13",
+        :"maxBandComb-r10"
+      ]
+  end
+
   test "search_field/3 - goal starting with root" do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:MasterInformationBlock), [:MasterInformationBlock, :"phich-Config"]) ==

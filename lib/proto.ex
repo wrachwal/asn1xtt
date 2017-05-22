@@ -3,11 +3,11 @@ defmodule Proto do
   #####################################
 
   def conv({:getf, meta, [f]}, data, type) when is_atom(f) do
-    IO.puts "gf #{inspect f}"
+#   IO.puts "gf #{inspect f}"
     {:getf, meta, [data, type, f]}
   end
   def conv({:with_msg, meta, [data, type, [do: block]]}, _data, _type) do
-    IO.puts "wm (#{Macro.to_string(data)}, #{inspect type})"
+#   IO.puts "wm (#{Macro.to_string(data)}, #{inspect type})"
     {:with_msg, meta, [data, type, [do: conv(block, data, type)]]}
   end
   def conv(ast, _data, _type) do
@@ -34,10 +34,10 @@ defmodule Proto do
     end
   end
   def __getf(name) when is_atom(name) do
-    IO.puts "__getf ~~> #{inspect name}"
+#   IO.puts "__getf ~~> #{inspect name}"
   end
-  def __getf(data, type, name) when is_atom(type) and is_atom(name) do
-    IO.puts "__getf(#{inspect data} | #{inspect type} |#{inspect name}"
+  def __getf(_data, type, name) when is_atom(type) and is_atom(name) do
+#   IO.puts "__getf(#{inspect data} | #{inspect type} |#{inspect name}"
   end
 end
 

@@ -10,7 +10,6 @@ defmodule ASN.CTT do
                       typedef: nil,
                       valuedef: nil,
                       classdef: nil,
-                      module: nil,
                       type: nil,
                       SEQUENCE: :sequence,
                       Externaltypereference: :extyperef,

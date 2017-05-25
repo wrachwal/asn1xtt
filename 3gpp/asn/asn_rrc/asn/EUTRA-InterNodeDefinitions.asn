@@ -15,6 +15,7 @@ IMPORTS
     DRB-ToReleaseList,
     FreqBandIndicator-r11,
     InDeviceCoexIndication-r11,
+    LWA-Config-r13,
     MasterInformationBlock,
     maxBands,
     maxFreq,
@@ -27,6 +28,7 @@ IMPORTS
     MeasConfig,
     MeasGapConfig,
     MeasResultForRSSI-r13,
+    MeasResultListWLAN-r13,
     OtherConfig-r9,
     PhysCellId,
     P-Max,
@@ -151,6 +153,7 @@ HandoverPreparationInformation-v1320-IEs ::= SEQUENCE {
 
 HandoverPreparationInformation-v14x0-IEs ::= SEQUENCE {
     as-Config-v14x0                 AS-Config-v14x0                     OPTIONAL,   -- Cond HO2
+    makeBeforeBreakReq-r14          ENUMERATED {true}               OPTIONAL,   -- Cond HO2
     nonCriticalExtension            SEQUENCE {}                         OPTIONAL
 }
 
@@ -212,6 +215,11 @@ SCG-ConfigInfo-v1310-IEs ::=        SEQUENCE {
 
 SCG-ConfigInfo-v1330-IEs ::=        SEQUENCE {
     measResultListRSSI-SCG-r13      MeasResultListRSSI-SCG-r13          OPTIONAL,
+    nonCriticalExtension            SCG-ConfigInfo-v14xy-IEs                            OPTIONAL
+}
+
+SCG-ConfigInfo-v14xy-IEs ::=        SEQUENCE {
+    makeBeforeBreakSCG-Req-r14      ENUMERATED {true}                   OPTIONAL,
     nonCriticalExtension            SEQUENCE {}                         OPTIONAL
 }
 
@@ -379,7 +387,9 @@ AS-Config-v1320 ::=             SEQUENCE {
 }
 
 AS-Config-v14x0 ::=             SEQUENCE {
-    sourceSL-V2X-CommConfig-r14         SL-V2X-ConfigDedicated-r14                  OPTIONAL
+    sourceSL-V2X-CommConfig-r14         SL-V2X-ConfigDedicated-r14                  OPTIONAL,
+    sourceLWA-Config-r14                LWA-Config-r13                      OPTIONAL,
+    sourceWLAN-MeasResult-r14           MeasResultListWLAN-r13              OPTIONAL
 }
 
 AS-Context ::=                          SEQUENCE {

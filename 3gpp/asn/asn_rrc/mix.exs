@@ -3,7 +3,7 @@ defmodule ASN.RRC.Mixfile do
 
   def project do
     [app: :asn_rrc,
-     version: "14.1.0",
+     version: "14.2.1",
      compilers: [:asn1] ++ Mix.compilers,
      asn1_paths: ["asn1"],
      asn1_options: [:uper,        # Unaligned PER

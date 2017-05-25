@@ -39,6 +39,7 @@ IMPORTS
     RLF-Report-r9,
     TargetMBSFN-AreaList-r12,
     TraceReference-r10,
+    Tx-ResourcePoolMeasList-r14,
     VisitedCellInfoList-r12,
     maxCellMeas,
     maxCSI-RS-Meas-r12,
@@ -48,7 +49,9 @@ IMPORTS
     WLAN-CarrierInfo-r13,
     WLAN-Identifiers-r12,
     WLAN-Id-List-r13,
-    WLAN-Status-r13
+    WLAN-Status-r13,
+    WLAN-Status-v14x0,
+    WLAN-SuspendConfig-r14
 
 
 FROM EUTRA-RRC-Definitions;
@@ -134,6 +137,7 @@ VarMeasReport ::=                   SEQUENCE {
     measId-v1250                        MeasId-v1250                    OPTIONAL,
     cellsTriggeredList                  CellsTriggeredList              OPTIONAL,
     csi-RS-TriggeredList-r12            CSI-RS-TriggeredList-r12        OPTIONAL,
+    poolsTriggeredList-r14              Tx-ResourcePoolMeasList-r14 OPTIONAL,
     numberOfReportsSent                 INTEGER
 }
 
@@ -179,11 +183,13 @@ VarShortResumeMAC-Input-r13 ::=     SEQUENCE {
 
 VarWLAN-MobilityConfig ::=                  SEQUENCE {
     wlan-MobilitySet-r13                    WLAN-Id-List-r13            OPTIONAL,
-    successReportRequested                  ENUMERATED {true}           OPTIONAL
+    successReportRequested                  ENUMERATED {true}           OPTIONAL,
+    wlan-SuspendConfig-r14                  WLAN-SuspendConfig-r14      OPTIONAL
 }
 
 VarWLAN-Status-r13 ::=              SEQUENCE {
-    status-r13                              WLAN-Status-r13
+    status-r13                              WLAN-Status-r13,
+    status-r14                              WLAN-Status-v14x0   OPTIONAL
 }
 
 maxLogMeas-r10              INTEGER ::= 4060-- Maximum number of logged measurement entries

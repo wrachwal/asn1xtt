@@ -5,9 +5,9 @@ defmodule AsnCttTest do
 
   test "CTT.asn_type_use/1" do
     assert is_map(cnt = CTT.asn_type_use(&RRC.db/1))
-    assert map_size(cnt) == 1569
+    assert map_size(cnt) == 1757
     singles = cnt |> Enum.filter(fn {_, v} -> v == 1 end) |> Keyword.keys
-    assert length(singles) == 238
+    assert length(singles) == 257
   # IO.inspect singles |> Enum.sort(), limit: 1000
     assert :TimeAlignmentTimer in singles
   end
@@ -21,19 +21,20 @@ defmodule AsnCttTest do
       |> Enum.sort
     assert kind_used == ["BIT STRING": 14,
                          BOOLEAN: 1,
-                         CHOICE: 90,
-                         ENUMERATED: 65,
-                         Externaltypereference: 13, #XXX ???
-                         INTEGER: 94,
+                         CHOICE: 104,
+                         ENUMERATED: 73,
+                         Externaltypereference: 15, #XXX ???
+                         INTEGER: 99,
                          "OCTET STRING": 3,
-                         SEQUENCE: 995,
-                         "SEQUENCE OF": 294]
+                         SEQUENCE: 1111,
+                         "SEQUENCE OF": 337]
     exttyperefs =
       type_kind
       |> Enum.filter(fn {_, k} -> k == :Externaltypereference end)
       |> Keyword.keys
       |> Enum.sort
     assert exttyperefs == [:"BCCH-BCH-MessageType",
+                           :"BCCH-BCH-MessageType-MBMS-r14",
                            :"BCCH-BCH-MessageType-NB",
                            :"BandParametersDL-r13",
                            :"BandParametersUL-r13",
@@ -41,6 +42,7 @@ defmodule AsnCttTest do
                            :"RedirectedCarrierInfo-NB-r13",
                            :"SBCCH-SL-BCH-MessageType",
                            :"SystemInformation-BR-r13",
+                           :"SystemInformation-MBMS-r14",
                            :"SystemInformationBlockType1-BR-r13",
                            :"SystemInformationBlockType16-NB-r13",
                            :"VarMobilityHistoryReport-r12",
@@ -50,16 +52,18 @@ defmodule AsnCttTest do
 
   test "ASN.CTT.asn_roots/1" do
     assert CTT.asn_roots(&RRC.db/1) == [
-      :"BCCH-BCH-Message", :"BCCH-BCH-Message-NB", :"BCCH-DL-SCH-Message",
-      :"BCCH-DL-SCH-Message-BR", :"BCCH-DL-SCH-Message-NB", :"CHARACTER STRING",
+      :"BCCH-BCH-Message", :"BCCH-BCH-Message-MBMS", :"BCCH-BCH-Message-NB", :"BCCH-DL-SCH-Message",
+      :"BCCH-DL-SCH-Message-BR", :"BCCH-DL-SCH-Message-MBMS", :"BCCH-DL-SCH-Message-NB",
+      :"CHARACTER STRING", :"CSI-RS-Config-v14xy",
       :"DL-CCCH-Message", :"DL-CCCH-Message-NB", :"DL-DCCH-Message",
       :"DL-DCCH-Message-NB", :"EMBEDDED PDV", :EXTERNAL, :HandoverCommand,
       :HandoverPreparationInformation, :"HandoverPreparationInformation-NB",
       :"HandoverPreparationInformation-v9j0-IEs", :"MCCH-Message", :"PCCH-Message",
-      :"PCCH-Message-NB", :"RRCConnectionReconfiguration-v8m0-IEs",
-      :"RRCConnectionRelease-v9e0-IEs", :"SBCCH-SL-BCH-Message",
-      :"SC-MCCH-Message-r13", :"SCG-ConfigInfo-r12", :"SL-Preconfiguration-r12",
-      :"SL-V2X-Preconfiguration-r14", :"SystemInformationBlockType1-v8h0-IEs",
+      :"PCCH-Message-NB", :"PUSCH-ConfigDedicatedScell-v14xy", :"RRCConnectionReconfiguration-v8m0-IEs",
+      :"RRCConnectionRelease-v9e0-IEs", :"SBCCH-SL-BCH-Message", :"SC-MCCH-Message-NB",
+      :"SC-MCCH-Message-r13", :"SCG-ConfigInfo-r12", :"SCGFailureInformation-v12d0-IEs",
+      :"SL-Preconfiguration-r12", :"SL-V2X-Preconfiguration-r14",
+      :"SystemInformationBlockType1-v8h0-IEs",
       :"SystemInformationBlockType2-v8h0-IEs",
       :"SystemInformationBlockType3-v10j0-IEs",
       :"SystemInformationBlockType5-v8h0-IEs",
@@ -80,9 +84,11 @@ defmodule AsnCttTest do
   end
 
   test "__typedef__ and __valuedef__ are in order as in .asn" do
-    assert Enum.take(RRC.db(:__typedef__), 6) == [
+    assert Enum.take(RRC.db(:__typedef__), 8) == [
         :"BCCH-BCH-Message",
         :"BCCH-BCH-MessageType",
+        :"BCCH-BCH-Message-MBMS",
+        :"BCCH-BCH-MessageType-MBMS-r14",
         :"BCCH-DL-SCH-Message",
         :"BCCH-DL-SCH-MessageType",
         :"BCCH-DL-SCH-Message-BR",
@@ -150,6 +156,21 @@ defmodule AsnCttTest do
          {:cellAccessRelatedInfo, 1, :mandatory},
          {:systemInformationBlockType1, :ALT, :mandatory},
          {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
+       {[],
+        [{:"plmn-Identity", 1, :mandatory},
+         :LIST,
+         {:"plmn-IdentityList-r14", 1, :OPTIONAL},
+         :LIST,
+         {:"v2x-InterFreqInfoList-r14", 6, :OPTIONAL},
+         {:"sl-V2X-ConfigCommon-r14", 1, :OPTIONAL},
+         {:"sib21-v14x0", :ALT, :mandatory},
+         :LIST,
+         {:"sib-TypeAndInfo", 1, :mandatory},
+         {:"systemInformation-r8", :ALT, :mandatory},
+         {:criticalExtensions, 1, :mandatory},
+         {:systemInformation, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
          {:message, 1, :mandatory}]}]
   end
 
@@ -165,6 +186,21 @@ defmodule AsnCttTest do
          {:c1, :ALT, :mandatory},
          {:message, 1, :mandatory}]},
        {[], # final result #2
+        [{:"plmn-Identity", 1, :mandatory},
+         :LIST,
+         {:"plmn-IdentityList-r14", 1, :OPTIONAL},
+         :LIST,
+         {:"v2x-InterFreqInfoList-r14", 6, :OPTIONAL},
+         {:"sl-V2X-ConfigCommon-r14", 1, :OPTIONAL},
+         {:"sib21-v14x0", :ALT, :mandatory},
+         :LIST,
+         {:"sib-TypeAndInfo", 1, :mandatory},
+         {:"systemInformation-r8", :ALT, :mandatory},
+         {:criticalExtensions, 1, :mandatory},
+         {:systemInformation, :ALT, :mandatory},
+         {:c1, :ALT, :mandatory},
+         {:message, 1, :mandatory}]},
+       {[], # final result #3
         [{:"plmnIdentity-r12", :ALT, :mandatory},
          :LIST,
          {:"plmn-IdentityList-r12", 2, :OPTIONAL},

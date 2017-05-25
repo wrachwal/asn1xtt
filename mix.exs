@@ -28,8 +28,8 @@ defmodule Asn1xtt.Mixfile do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    [
-      {:asn_rrc,  path: "3gpp/asn/asn_rrc", only: [:dev, :test]}
-    ]
+    [{:asn_rrc,  path: "3gpp/asn/asn_rrc", only: [:dev, :test]},
+     {:asn_s1ap,  path: "3gpp/asn/asn_s1ap", only: [:dev, :test]},
+     {:asn_x2ap,  path: "3gpp/asn/asn_x2ap", only: [:dev, :test]}]
   end
 end

@@ -39,7 +39,7 @@ defmodule ASN.CTT do
     tab_kv = :ets.tab2list(tab)
     kind_map = Enum.reduce(tab_kv, %{}, &asn1db_reduce_kv/2)
     tab_kv = [{:__asn1db__, kind_map |> Map.keys() |> Enum.sort()} | tab_kv]
-    {types, values, [], [], [], []} = module(tab_kv[:MODULE], :typeorval)
+    {types, values, _, _, _, _} = module(tab_kv[:MODULE], :typeorval)
     typeord = types |> Enum.reverse() |> Enum.with_index |> Map.new
     valueord = values |> Enum.reverse() |> Enum.with_index |> Map.new
     for {kind, keys} <- kind_map, into: tab_kv do

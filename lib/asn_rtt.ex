@@ -45,11 +45,16 @@ defmodule ASN.RTT do
   @doc """
   Convert expanded map-based ASN.1 data back to the standard record-based form.
   """
-  def from_map(expanded_map, rec2kv) when is_function(rec2kv, 1) do
-    conv_from(expanded_map, rec2kv)
+  def from_map(expanded_map, rec2kv, reck2v \\ &extension_default/2)
+      when is_function(rec2kv, 1) and is_function(reck2v, 2) do
+    conv_from(expanded_map, rec2kv, reck2v)
   end
 
-  defp conv_from(%{__record__: type} = map, rec2kv) do
+  defp extension_default(_type, _field) do
+    nil
+  end
+
+  defp conv_from(%{__record__: type} = map, rec2kv, reck2v) do
     kd = rec2kv.(type) || raise "#{inspect type} is not ASN.1 record type"
     kv = Map.to_list(map) |> Keyword.delete_first(:__record__)
     {rem, kv} =
@@ -57,11 +62,15 @@ defmodule ASN.RTT do
         case Keyword.fetch(kv, k) do
           {:ok, v} ->
             kv = kv |> Keyword.pop_first(k) |> elem(1)
-            {kv, [{k, conv_from(v, rec2kv)} | acc]}
+            {kv, [{k, conv_from(v, rec2kv, reck2v)} | acc]}
           :error ->
             case d do
               :asn1_NOVALUE -> {kv, [{k, :asn1_NOVALUE} | acc]}
-              :undefined -> raise "Missing #{inspect k} field in #{inspect type}"
+              :undefined ->
+                case reck2v.(type, k) do
+                  nil -> raise "Missing #{inspect k} field in #{inspect type}"
+                  v -> {kv, [{k, v} | acc]}
+                end
               _d -> {kv, [{k, d} | acc]}
             end
         end
@@ -69,15 +78,15 @@ defmodule ASN.RTT do
     rem == [] or raise "Unknown #{inspect Keyword.keys(rem)} fields in #{inspect type}"
     [type | kv |> Keyword.values |> Enum.reverse] |> List.to_tuple
   end
-  defp conv_from(choice, rec2kv) when is_map(choice) do
+  defp conv_from(choice, rec2kv, reck2v) when is_map(choice) do
     map_size(choice) == 1 or raise "dubious choice #{inspect Map.keys(choice)}"
     {a, v} = choice |> Map.to_list |> hd
-    {a, conv_from(v, rec2kv)}
+    {a, conv_from(v, rec2kv, reck2v)}
   end
-  defp conv_from(list, rec2kv) when is_list(list) do
-    Enum.map(list, &conv_from(&1, rec2kv))
+  defp conv_from(list, rec2kv, reck2v) when is_list(list) do
+    Enum.map(list, &conv_from(&1, rec2kv, reck2v))
   end
-  defp conv_from(val, _rec2kv) do
+  defp conv_from(val, _rec2kv, _reck2v) do
     val
   end
 

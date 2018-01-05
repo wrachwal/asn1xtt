@@ -165,7 +165,7 @@ defmodule ASN.CTT do
   def kind_mapping(:"SEQUENCE OF"), do: :list
 
   def asn_roots(db) when is_function(db, 1) do
-    for {type, 1} <- asn_type_use(db), not kind_mapping(asn_type_kind(db, type)) in [:scalar] do
+    for {type, 1} <- asn_type_use(db), kind_mapping(asn_type_kind(db, type)) not in [:scalar] do
       type
     end |> Enum.sort()
   end

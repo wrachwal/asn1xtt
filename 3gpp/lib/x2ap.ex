@@ -3,6 +3,6 @@ defmodule X2AP do
 
   @asn1db Path.join(__DIR__, "../asn/asn_x2ap/src/asn_x2ap.asn1db")
 
-  ASN.CTT.burn_asn1db(@asn1db)
+  ASN.CTT.burn_asn1db(@asn1db, :db)
 
 end

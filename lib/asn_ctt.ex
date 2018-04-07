@@ -21,14 +21,14 @@ defmodule ASN.CTT do
 
   # --------------------------------------------------------------------------
 
-  defmacro burn_asn1db(asn1db) do
-    quote bind_quoted: [asn1db: asn1db] do
+  defmacro burn_asn1db(asn1db, fun \\ :asn1db) do
+    quote bind_quoted: [asn1db: asn1db, fun: fun] do
       require Record
       kv_list = ASN.CTT.__asn1db_kv(asn1db)
       Enum.each kv_list, fn {k, v} ->
         is_atom(k) or raise "not atom key #{inspect k} has value #{inspect v}"
         v = Macro.escape(v)
-        def db(unquote(k)), do: unquote(v)
+        def unquote(fun)(unquote(k)), do: unquote(v)
       end
     end
   end

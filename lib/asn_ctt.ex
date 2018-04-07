@@ -8,10 +8,13 @@ defmodule ASN.CTT do
 
   for {rec, tag} <- %{module: nil,
                       typedef: nil,
-                      valuedef: nil,
                       classdef: nil,
+                      valuedef: nil,
+                      ptypedef: nil,
                       type: nil,
                       SEQUENCE: :sequence,
+                      Object: :object,
+                      ObjectSet: :objectset,
                       Externaltypereference: :extyperef,
                       ComponentType: :comptype,
                       ExtensionAdditionGroup: :extaddgroup,
@@ -37,25 +40,49 @@ defmodule ASN.CTT do
   def __asn1db_kv(asn1db) do
     {:ok, tab} = :ets.file2tab(String.to_charlist(asn1db))
     tab_kv = :ets.tab2list(tab)
+    tab_map = Map.new(tab_kv)
     kind_map = Enum.reduce(tab_kv, %{}, &asn1db_reduce_kv/2)
-    tab_kv = [{:__asn1db__, kind_map |> Map.keys() |> Enum.sort()} | tab_kv]
-    {types, values, _, _, _, _} = module(tab_kv[:MODULE], :typeorval)
-    typeord = types |> Enum.reverse() |> Enum.with_index |> Map.new
-    valueord = values |> Enum.reverse() |> Enum.with_index |> Map.new
-    for {kind, keys} <- kind_map, into: tab_kv do
+    {typeord, valueord, ptypeord, classord, objord, objsetord} =
+      module(Map.fetch!(tab_map, :MODULE), :typeorval)
+      |> Tuple.to_list()
+      |> Enum.map(fn list -> list |> Enum.reverse |> Enum.with_index |> Map.new end)
+      |> List.to_tuple()
+    kind_kv = Enum.map(kind_map, fn {kind, keys} ->
       keys =
         case kind do
-          :__typedef__ -> keys |> Enum.sort(&(typeord[&1] <= typeord[&2]))
-          :__valuedef__ -> keys |> Enum.sort(&(valueord[&1] <= valueord[&2]))
-          _other -> keys |> Enum.reverse()
+          :__typedef__ ->
+            keys
+            |> Enum.map(&{typedef_slot(Map.fetch!(tab_map, &1), typeord, objord, objsetord), &1})
+            |> Enum.sort()
+            |> Enum.reverse()
+            |> Enum.reduce(Tuple.duplicate([], 6), fn {{slot, _ord}, type}, acc ->
+              update_in(acc, [Access.elem(slot)], &[type | &1])
+            end)
+          :__classdef__ ->
+            keys
+            |> Enum.map(&{classdef_slot(Map.fetch!(tab_map, &1), classord), &1})
+            |> Enum.sort()
+            |> Enum.reverse()
+            |> Enum.reduce(Tuple.duplicate([], 2), fn {{slot, _ord}, class}, acc ->
+              update_in(acc, [Access.elem(slot)], &[class | &1])
+            end)
+          :__valuedef__ -> Enum.sort(keys, &(Map.fetch!(valueord, &1) <= Map.fetch!(valueord, &2)))
+          :__ptypedef__ -> Enum.sort(keys, &(Map.fetch!(ptypeord, &1) <= Map.fetch!(ptypeord, &2)))
+          :__UNKNOWN__ -> Enum.sort(keys)
         end
       {kind, keys}
-    end
+    end)
+    kindord = [__typedef__: 0, __valuedef__: 1, __ptypedef__: 2, __classdef__: 3, __UNKNOWN__: 4]
+    kind_kv = Enum.sort(kind_kv, fn {k1, _v1}, {k2, _v2} -> kindord[k1] <= kindord[k2] end)
+    [{:__asn1db__, [:MODULE, @venc | Keyword.keys(kind_kv)]} | kind_kv] ++ tab_kv
   end
 
   defp asn1db_reduce_kv({k, typedef()}, map), do: asn1db_put_kind(map, :__typedef__, k)
+  defp asn1db_reduce_kv({k, classdef()}, map), do: asn1db_put_kind(map, :__classdef__, k)
   defp asn1db_reduce_kv({k, valuedef()}, map), do: asn1db_put_kind(map, :__valuedef__, k)
-  defp asn1db_reduce_kv({k, _}, map), do: asn1db_put_kind(map, k, k)
+  defp asn1db_reduce_kv({k, ptypedef()}, map), do: asn1db_put_kind(map, :__ptypedef__, k)
+  defp asn1db_reduce_kv({k, _}, map) when k in [:MODULE, @venc], do: map
+  defp asn1db_reduce_kv({k, _}, map), do: asn1db_put_kind(map, :__UNKNOWN__, k)
 
   defp asn1db_put_kind(map, kind, k) do
     map
@@ -63,10 +90,23 @@ defmodule ASN.CTT do
     |> update_in([kind], &([k | &1]))
   end
 
+  defp typedef_slot(typedef(name: name, typespec: spec), typeord, objord, objsetord) do
+    cond do
+      match?(type(), spec) -> (ord = typeord[name]) && {0, ord} || {3, name}
+      match?(object(), spec) -> (ord = objord[name]) && {1, ord} || {4, name}
+      match?(objectset(), spec) -> (ord = objsetord[name]) && {2, ord} || {5, name}
+    end
+  end
+
+  defp classdef_slot(classdef(name: name), classord) do
+    (ord = classord[name]) && {0, ord} || {1, name}
+  end
+
   # --------------------------------------------------------------------------
 
   def asn_type_use(db) when is_function(db, 1) do
     db.(:__typedef__)
+    |> elem(0) # {:typedef, ... {:type, ...
     |> Enum.map(&{&1, db.(&1)})
     |> Enum.reduce(%{}, fn
       {type, typedef(name: type) = tdef}, tref -> tref_typedef(tref, tdef)
@@ -139,6 +179,7 @@ defmodule ASN.CTT do
 
   def asn_type_kind(db) when is_function(db, 1) do
     db.(:__typedef__)
+    |> elem(0)
     |> Enum.map(&{&1, asn_type_kind(db, &1)})
     |> Map.new
   end

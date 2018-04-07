@@ -3,13 +3,31 @@ defmodule AsnCttTest do
 
   alias ASN.CTT
 
-  test "CTT.asn_type_use/1" do
-    assert is_map(cnt = CTT.asn_type_use(&RRC.db/1))
-    assert map_size(cnt) == 1757
-    singles = cnt |> Enum.filter(fn {_, v} -> v == 1 end) |> Keyword.keys
-    assert length(singles) == 257
-  # IO.inspect singles |> Enum.sort(), limit: 1000
-    assert :TimeAlignmentTimer in singles
+  defp tuple_lists_lengths(tuple) do
+    tuple
+    |> Tuple.to_list()
+    |> Enum.map(&length/1)
+    |> List.to_tuple()
+  end
+
+  test "__typedef__ tuple lists lengths" do
+    # 0 -> {:typedef, ... {:type, ...
+    # 1 -> {:typedef, ... {:Object, ...
+    # 2 -> {:typedef, ... {:ObjectSet, ...
+    # 3 -> like 0, but not in :MODULE's :typeorval
+    # 4 -> like 1, but not in :MODULE's :typeorval
+    # 5 -> like 2, but not in :MODULE's :typeorval
+    assert tuple_lists_lengths(RRC.db(:__typedef__)) == {1754, 0, 0, 3, 0, 0}
+    assert tuple_lists_lengths(S1AP.db(:__typedef__)) == {496, 60, 238, 3, 0, 490}
+    assert tuple_lists_lengths(X2AP.db(:__typedef__)) == {419, 27, 202, 3, 0, 398}
+  end
+
+  test "__classdef__ tuple lists lengths" do
+    # 0 -> {:classdef, ...
+    # 1 -> like 0, but not in :MODULE's :typeorval
+    assert tuple_lists_lengths(RRC.db(:__classdef__)) == {0, 2}
+    assert tuple_lists_lengths(S1AP.db(:__classdef__)) == {5, 2}
+    assert tuple_lists_lengths(X2AP.db(:__classdef__)) == {5, 2}
   end
 
   test "CTT.asn_type_kind/1" do
@@ -26,7 +44,7 @@ defmodule AsnCttTest do
                          Externaltypereference: 15, #XXX ???
                          INTEGER: 99,
                          "OCTET STRING": 3,
-                         SEQUENCE: 1111,
+                         SEQUENCE: 1108,
                          "SEQUENCE OF": 337]
     exttyperefs =
       type_kind
@@ -54,9 +72,9 @@ defmodule AsnCttTest do
     assert CTT.asn_roots(&RRC.db/1) == [
       :"BCCH-BCH-Message", :"BCCH-BCH-Message-MBMS", :"BCCH-BCH-Message-NB", :"BCCH-DL-SCH-Message",
       :"BCCH-DL-SCH-Message-BR", :"BCCH-DL-SCH-Message-MBMS", :"BCCH-DL-SCH-Message-NB",
-      :"CHARACTER STRING", :"CSI-RS-Config-v14xy",
+      :"CSI-RS-Config-v14xy",
       :"DL-CCCH-Message", :"DL-CCCH-Message-NB", :"DL-DCCH-Message",
-      :"DL-DCCH-Message-NB", :"EMBEDDED PDV", :EXTERNAL, :HandoverCommand,
+      :"DL-DCCH-Message-NB", :HandoverCommand,
       :HandoverPreparationInformation, :"HandoverPreparationInformation-NB",
       :"HandoverPreparationInformation-v9j0-IEs", :"MCCH-Message", :"PCCH-Message",
       :"PCCH-Message-NB", :"PUSCH-ConfigDedicatedScell-v14xy", :"RRCConnectionReconfiguration-v8m0-IEs",
@@ -84,7 +102,7 @@ defmodule AsnCttTest do
   end
 
   test "__typedef__ and __valuedef__ are in order as in .asn" do
-    assert Enum.take(RRC.db(:__typedef__), 8) == [
+    assert (RRC.db(:__typedef__) |> elem(0) |> Enum.take(8))  == [
         :"BCCH-BCH-Message",
         :"BCCH-BCH-MessageType",
         :"BCCH-BCH-Message-MBMS",

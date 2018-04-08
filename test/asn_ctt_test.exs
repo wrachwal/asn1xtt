@@ -123,9 +123,7 @@ defmodule AsnCttTest do
     db = &RRC.db/1
     assert CTT.search_field(db, db.(:MasterInformationBlock), [:MasterInformationBlock, :"phich-Config"]) ==
       [{[],
-        [{:"phich-Config", 2, :mandatory}]},
-       {[:"phich-Config"],
-        []}]
+        [{:"phich-Config", 2, :mandatory}]}]
   end
 
   test "search_field/3 - goal without root" do
@@ -141,9 +139,7 @@ defmodule AsnCttTest do
       [{[],
         [{:systemInformationBlockType1, :ALT, :mandatory},
          {:c1, :ALT, :mandatory},
-         {:message, 1, :mandatory}]},
-       {[:systemInformationBlockType1],
-        []}]
+         {:message, 1, :mandatory}]}]
   end
 
   test "search_field/3 - CHOICE field without root" do
@@ -284,10 +280,6 @@ defmodule AsnCttTest do
          {:criticalExtensions, 2, :mandatory},
          {:rrcConnectionReconfiguration, :ALT, :mandatory},
          {:c1, :ALT, :mandatory},
-         {:message, 1, :mandatory}]},
-       {[:bucketSizeDuration],
-        [{:rrcConnectionReconfiguration, :ALT, :mandatory},
-         {:c1, :ALT, :mandatory},
          {:message, 1, :mandatory}]}]
   end
 
@@ -307,30 +299,12 @@ defmodule AsnCttTest do
          {:"rrcConnectionResume-r13", :ALT, :mandatory},
          {:c1, :ALT, :mandatory},
          {:message, 1, :mandatory}]},
-       {[:bucketSizeDuration],
-        [{:"drb-ToAddModList", 2, :OPTIONAL},
-         {:"radioResourceConfigDedicated-r13", 1, :OPTIONAL},
-         {:"rrcConnectionResume-r13", :ALT, :mandatory},
-         {:c1, :ALT, :mandatory},
-         {:criticalExtensions, 2, :mandatory},
-         {:"rrcConnectionResume-r13", :ALT, :mandatory},
-         {:c1, :ALT, :mandatory},
-         {:message, 1, :mandatory}]},
        {[],
         [{:bucketSizeDuration, 3, :mandatory},
          {:"ul-SpecificParameters", 1, :OPTIONAL},
          {:logicalChannelConfig, 6, :OPTIONAL},
          :LIST,
          {:"drb-ToAddModList", 2, :OPTIONAL},
-         {:radioResourceConfigDedicated, 4, :OPTIONAL},
-         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
-         {:c1, :ALT, :mandatory},
-         {:criticalExtensions, 2, :mandatory},
-         {:rrcConnectionReconfiguration, :ALT, :mandatory},
-         {:c1, :ALT, :mandatory},
-         {:message, 1, :mandatory}]},
-       {[:bucketSizeDuration],
-        [{:"drb-ToAddModList", 2, :OPTIONAL},
          {:radioResourceConfigDedicated, 4, :OPTIONAL},
          {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
          {:c1, :ALT, :mandatory},
@@ -354,19 +328,6 @@ defmodule AsnCttTest do
          {:c1, :ALT, :mandatory},
          {:criticalExtensions, 2, :mandatory},
          {:rrcConnectionReconfiguration, :ALT, :mandatory},
-         {:c1, :ALT, :mandatory},
-         {:message, 1, :mandatory}]},
-       {[:bucketSizeDuration],
-        [{:"drb-ToAddModList", 2, :OPTIONAL},
-         {:radioResourceConfigDedicated, 4, :OPTIONAL},
-         {:"rrcConnectionReconfiguration-r8", :ALT, :mandatory},
-         {:c1, :ALT, :mandatory},
-         {:criticalExtensions, 2, :mandatory},
-         {:rrcConnectionReconfiguration, :ALT, :mandatory},
-         {:c1, :ALT, :mandatory},
-         {:message, 1, :mandatory}]},
-       {[:"drb-ToAddModList", :bucketSizeDuration],
-        [{:rrcConnectionReconfiguration, :ALT, :mandatory},
          {:c1, :ALT, :mandatory},
          {:message, 1, :mandatory}]}]
   end

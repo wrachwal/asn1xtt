@@ -221,6 +221,21 @@ defmodule ASN.CTT do
 
   def search_field(db, node, goal) do
     search_field(db, node, goal, [], [])
+    |> Enum.reverse()
+    |> eliminate_partial_results([])
+  end
+
+  defp eliminate_partial_results([], acc), do: acc
+  defp eliminate_partial_results([r], acc), do: [r | acc]
+  defp eliminate_partial_results([{[_ | g2], p1} = r1, {g2, p2} = r2 | t], acc) do
+    if List.starts_with?(Enum.reverse(p2), Enum.reverse(p1)) do
+      eliminate_partial_results([r2 | t], acc)
+    else
+      eliminate_partial_results([r2 | t], [r1 | acc])
+    end
+  end
+  defp eliminate_partial_results([r1, r2 | t], acc) do
+    eliminate_partial_results([r2 | t], [r1 | acc])
   end
 
   defp search_field(_db, _node, [], _pl, acc), do: acc

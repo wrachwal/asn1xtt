@@ -105,6 +105,19 @@ defmodule ASN.CTT do
 
   # --------------------------------------------------------------------------
 
+  defmacro burn_record(asn1hrl) do
+    quote bind_quoted: [asn1hrl: asn1hrl] do
+      require Record
+      rec2kv = Record.extract_all(from: asn1hrl)
+      Enum.each(rec2kv, fn {rec, kv} ->
+        Record.defrecord rec, kv
+      end)
+      rec2kv
+    end
+  end
+
+  # --------------------------------------------------------------------------
+
   def asn_type_use(db) when is_function(db, 1) do
     db.(:__typedef__)
     |> elem(0) # {:typedef, ... {:type, ...

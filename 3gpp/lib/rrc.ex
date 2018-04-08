@@ -1,10 +1,22 @@
+srcdir = Path.join(__DIR__, "../asn/asn_rrc/src")
+
+defmodule RRC.ASN do
+  require ASN.CTT
+  rec2kv = ASN.CTT.burn_record(Path.join(srcdir, "asn_rrc.hrl"))
+  def record do
+    unquote(Keyword.keys(rec2kv))
+  end
+  Enum.each(rec2kv, fn {rec, kv} ->
+    def rec2kv(unquote(rec)), do: unquote(kv)
+  end)
+  def rec2kv(rec) when is_atom(rec), do: nil
+end
+
 defmodule RRC do
   require ASN.CTT
   require Record
 
-  @asn1db Path.join(__DIR__, "../asn/asn_rrc/src/asn_rrc.asn1db")
-
-  ASN.CTT.burn_asn1db(@asn1db, :db)
+  ASN.CTT.burn_asn1db(Path.join(srcdir, "asn_rrc.asn1db"), :db)
   |> Keyword.values()
   |> Enum.filter(&Record.is_record/1)
   |> Enum.map(&elem(&1, 0))

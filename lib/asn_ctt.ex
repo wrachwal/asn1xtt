@@ -33,6 +33,7 @@ defmodule ASN.CTT do
         v = Macro.escape(v)
         def unquote(fun)(unquote(k)), do: unquote(v)
       end
+      kv_list
     end
   end
 

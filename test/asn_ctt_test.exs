@@ -341,4 +341,10 @@ defmodule AsnCttTest do
          {:message, 1, :mandatory}]}]         # BCCH-BCH-Message
   end
 
+  test "search_field/3 in s1ap..." do
+    db = &S1AP.db/1
+    assert CTT.search_field(db, db.(:"S1AP-PDU"), [:"S1AP-PDU", :"e-RAB-ID"]) ==
+      [{[:"e-RAB-ID"], []}] #FIXME
+  end
+
 end

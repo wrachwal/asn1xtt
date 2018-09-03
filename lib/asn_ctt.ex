@@ -18,6 +18,7 @@ defmodule ASN.CTT do
                       Externaltypereference: :extyperef,
                       ComponentType: :comptype,
                       ExtensionAdditionGroup: :extaddgroup,
+                      ObjectClassFieldType: :ocft,
                     } do
     Record.defrecord tag || rec, rec, asn1_records[rec]
   end
@@ -257,20 +258,26 @@ defmodule ASN.CTT do
     do: search_field(db, spec, gt, pl, [{gt, pl} | acc])
   defp search_field(db, typedef(name: _, typespec: spec), gl, pl, acc),
     do: search_field(db, spec, gl, pl, acc)
-  defp search_field(db, type(def: def), gl, pl, acc),
-    do: search_field(db, def, gl, pl, acc)
-  defp search_field(db, extyperef(type: type), gl, pl, acc) when is_atom(type),
+  defp search_field(db, type(def: def, constraint: constraint), gl, pl, acc),
+    do: search_field(db, {def, constraint}, gl, pl, acc)
+  defp search_field(db, {extyperef(type: type), _constraint}, gl, pl, acc) when is_atom(type),
     do: search_field(db, db.(type), gl, pl, acc)
-  defp search_field(db, sequence(components: comps, extaddgroup: :undefined), gl, pl, acc),
+  defp search_field(db, {sequence(components: comps, extaddgroup: :undefined), _constraint}, gl, pl, acc),
     do: search_components(db, comps, gl, pl, acc)
-  defp search_field(db, sequence(components: comps, extaddgroup: exts), gl, pl, acc),
+  defp search_field(db, {sequence(components: comps, extaddgroup: exts), _constraint}, gl, pl, acc),
     do: search_components(db, exts, gl, pl, search_components(db, comps, gl, pl, acc))
-  defp search_field(db, {:CHOICE, comps}, gl, pl, acc),
+  defp search_field(db, {{:CHOICE, comps}, _constraint}, gl, pl, acc),
     do: search_components(db, comps, gl, pl, acc)
-  defp search_field(db, {:"SEQUENCE OF", type() = type}, gl, pl, acc),
+  defp search_field(db, {{:"SEQUENCE OF", type() = type}, _constraint}, gl, pl, acc),
     do: search_field(db, type, gl, [@list | pl], acc)
-  defp search_field(_db, {scalar, _}, _gl, _pl, acc) when scalar in @scalar2, do: acc
-  defp search_field(_db, scalar, _gl, _pl, acc) when scalar in @scalar1, do: acc
+
+  defp search_field(db, {ocft() = ocft, constraint}, gl, pl, acc) do
+    IO.puts "===\nocft: #{inspect ocft}\nconstraint: #{inspect constraint}\ngl: #{inspect gl}\npl: #{inspect pl}\n#acc: #{inspect acc}"
+    acc
+  end
+
+  defp search_field(_db, {{scalar, _}, _constraint}, _gl, _pl, acc) when scalar in @scalar2, do: acc
+  defp search_field(_db, {scalar, _constraint}, _gl, _pl, acc) when scalar in @scalar1, do: acc
 
   defp search_components(db, {comps, exts}, gl, pl, acc),
     do: search_comps_list(db, exts, gl, pl, search_comps_list(db, comps, gl, pl, acc))

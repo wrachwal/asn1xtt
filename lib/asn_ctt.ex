@@ -27,7 +27,6 @@ defmodule ASN.CTT do
 
   defmacro burn_asn1db(asn1db, fun \\ :asn1db) do
     quote bind_quoted: [asn1db: asn1db, fun: fun] do
-      require Record
       kv_list = ASN.CTT.__asn1db_kv(asn1db)
       Enum.each kv_list, fn {k, v} ->
         is_atom(k) or raise "not atom key #{inspect k} has value #{inspect v}"
@@ -36,6 +35,14 @@ defmodule ASN.CTT do
       end
       kv_list
     end
+  end
+
+  def func_asn1db(asn1db) do
+    map =
+      asn1db
+      |> ASN.CTT.__asn1db_kv()
+      |> Map.new()
+    &Map.fetch!(map, &1)
   end
 
   @doc false
@@ -271,7 +278,7 @@ defmodule ASN.CTT do
   defp search_field(db, {{:"SEQUENCE OF", type() = type}, _constraint}, gl, pl, acc),
     do: search_field(db, type, gl, [@list | pl], acc)
 
-  defp search_field(db, {ocft() = ocft, constraint}, gl, pl, acc) do
+  defp search_field(_db, {ocft() = ocft, constraint}, gl, pl, acc) do
     IO.puts "===\nocft: #{inspect ocft}\nconstraint: #{inspect constraint}\ngl: #{inspect gl}\npl: #{inspect pl}\n#acc: #{inspect acc}"
     acc
   end

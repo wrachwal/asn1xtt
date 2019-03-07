@@ -1,0 +1,44 @@
+Example DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+
+-- 1.3.6 Naming of Records in .hrl Files
+
+-- -record('Rec1_a_b',{c}).
+
+Rec1 ::= SEQUENCE {
+    a CHOICE {
+        b SEQUENCE {
+            c INTEGER
+        }
+    }
+}
+
+-- -record('Rec2_a_SEQOF'{b}).
+-- -record('Rec2_c_SETOF'{d}).
+
+Rec2 ::= SEQUENCE {
+    a SEQUENCE OF SEQUENCE {
+        b BOOLEAN
+    },
+    c SET OF SEQUENCE {
+        d INTEGER
+    }
+}
+
+WeekDay ::= ENUMERATED { mon(1), tue(2), wed(3), thu(4), fri(5), sat(6), sun(7) }
+
+Dim3 ::= SEQUENCE OF SEQUENCE OF SEQUENCE OF CHOICE {
+    pnt SEQUENCE {
+        x INTEGER,
+        y INTEGER
+    },
+    vec Vec,
+    day WeekDay
+}
+
+Vec ::= SEQUENCE {
+    x INTEGER,
+    y INTEGER
+}
+
+END

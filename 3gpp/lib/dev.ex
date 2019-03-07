@@ -1,5 +1,18 @@
 srcdir = Path.join(__DIR__, "../asn/asn_dev/src")
 
+defmodule Dev.ASN do
+  require ASN.CTT
+  rec2kv = ASN.CTT.burn_record(Path.join(srcdir, "asn_dev.hrl"))
+  def record do
+    unquote(Keyword.keys(rec2kv))
+  end
+  Enum.each(rec2kv, fn {rec, kv} ->
+    def rec2kv(unquote(rec)), do: unquote(kv)
+    IO.puts "# Dev.ASN.\"#{rec}\" => #{inspect kv}"
+  end)
+  def rec2kv(rec) when is_atom(rec), do: nil
+end
+
 defmodule Dev do
   require ASN.CTT
   require Record
@@ -20,8 +33,8 @@ defmodule Dev do
 
   def decode!(pdu, type) when is_binary(pdu) do
     case decode(pdu, type) do
-      {:ok, rrc} ->
-        rrc
+      {:ok, dev} ->
+        dev
       {:error, reason} ->
         raise "#{inspect type} (#{Base.encode16(pdu)}) decode error: #{inspect reason}"
     end

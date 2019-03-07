@@ -1,0 +1,1395 @@
+EUTRA-RRC-Definitions-MF DEFINITIONS AUTOMATIC TAGS ::=
+
+
+
+BEGIN
+
+
+
+IMPORTS
+
+ CellIdentity,
+
+ CSG-Identity,
+
+ DL-CCCH-MessageType,
+
+ DL-DCCH-MessageType,
+
+ maxObjectId-r13,
+
+ maxSCell-r13,
+
+
+ maxSIB-1,
+
+ maxSI-Message,
+
+ MeasCSI-RS-ToAddModList-r12,
+
+ MeasCSI-RS-ToRemoveList-r12,
+
+ MeasObjectId-r13,
+
+ MeasObjectToAddMod,
+
+ PCCH-MessageType,
+
+ PDCCH-CandidateReductions-r13,
+
+ PDCCH-CandidateReductionValue-r13,
+
+ PLMN-Identity,
+
+ PLMN-IdentityInfo,
+
+ RRC-TransactionIdentifier,
+
+ SCellIndex-r13,
+
+ ServCellIndex-r13,
+
+ SIB-Type,
+
+ SRS-AntennaPort,
+
+ SystemInformation,
+
+ SystemInformationBlockType1,
+
+ SystemInformationBlockType2,
+
+ TrackingAreaCode,
+
+ UE-EUTRA-Capability,
+
+ UL-CCCH-MessageType,
+
+ UL-DCCH-MessageType
+
+FROM EUTRA-RRC-Definitions;
+
+
+
+
+
+BCCH-BCH-Message-MF ::= SEQUENCE {
+
+ message BCCH-BCH-MessageType-MF
+
+}
+
+
+
+BCCH-BCH-MessageType-MF ::= MasterInformationBlock-MF
+
+
+
+
+
+BCCH-DL-SCH-Message-MF ::= SEQUENCE {
+
+ message BCCH-DL-SCH-MessageType-MF
+
+}
+
+
+
+BCCH-DL-SCH-MessageType-MF ::= CHOICE {
+
+ c1 CHOICE {
+
+ systemInformation-R1 SystemInformation-MF,
+
+ systemInformationBlockTypeMF1-R1 SystemInformationBlockTypeMF1
+
+ },
+
+ messageClassExtension SEQUENCE {}
+
+}
+
+
+
+
+
+
+PCCH-Message-MF ::= SEQUENCE {
+
+ message-3GPP OCTET STRING (CONTAINING PCCH-MessageType) OPTIONAL, -- Cond no-ext
+
+ message-MF PCCH-MessageType-MF OPTIONAL
+
+}
+
+
+
+PCCH-MessageType-MF ::= CHOICE {
+
+ c1 CHOICE {
+
+ spare NULL
+
+ },
+
+ messageClassExtension SEQUENCE {}
+
+}
+
+
+
+
+
+DL-CCCH-Message-MF ::= SEQUENCE {
+
+ message-3GPP OCTET STRING (CONTAINING DL-CCCH-MessageType) OPTIONAL, -- Cond no-ext
+
+ message-MF DL-CCCH-MessageType-MF OPTIONAL
+
+}
+
+
+
+DL-CCCH-MessageType-MF ::= CHOICE {
+
+ c1 CHOICE {
+
+ rrcConnectionSetup-R1 RRCConnectionSetup-MF,
+
+ rrcConnectionReestablishment-R1 RRCConnectionReestablishment-MF,
+
+ spare2 NULL, spare1 NULL
+
+ },
+
+ messageClassExtension SEQUENCE {}
+
+}
+
+
+
+
+
+DL-DCCH-Message-MF ::= SEQUENCE {
+
+ message-3GPP OCTET STRING (CONTAINING DL-DCCH-MessageType) OPTIONAL, -- Cond no-ext
+
+ message-MF DL-DCCH-MessageType-MF OPTIONAL
+
+}
+
+
+
+
+DL-DCCH-MessageType-MF ::= CHOICE {
+
+ c1 CHOICE {
+
+ rrcConnectionReconfiguration-R1 RRCConnectionReconfiguration-MF,
+
+ ueCapabilityEnquiry-R1 UECapabilityEnquiry-MF,
+
+ rrcConnectionResume-R1 RRCConnectionResume-MF,
+
+ spare13 NULL, spare12 NULL, spare11 NULL, spare10 NULL, spare9 NULL,
+
+ spare8 NULL, spare7 NULL, spare6 NULL, spare5 NULL, spare4 NULL,
+
+ spare3 NULL, spare2 NULL, spare1 NULL
+
+ },
+
+ messageClassExtension SEQUENCE {}
+
+}
+
+
+
+
+
+UL-CCCH-Message-MF ::= SEQUENCE {
+
+ message-3GPP OCTET STRING (CONTAINING UL-CCCH-MessageType) OPTIONAL, -- Cond no-ext
+
+ message-MF UL-CCCH-MessageType-MF OPTIONAL
+
+}
+
+
+
+UL-CCCH-MessageType-MF ::= CHOICE {
+
+ c1 CHOICE {
+
+ spare4 NULL, spare3 NULL, spare2 NULL, spare1 NULL
+
+ },
+
+ messageClassExtension SEQUENCE {}
+
+}
+
+
+
+
+
+UL-DCCH-Message-MF ::= SEQUENCE {
+
+ message-3GPP OCTET STRING (CONTAINING UL-DCCH-MessageType) OPTIONAL, -- Cond no-ext
+
+ message-MF UL-DCCH-MessageType-MF OPTIONAL
+
+}
+
+
+
+UL-DCCH-MessageType-MF ::= CHOICE {
+
+
+ c1 CHOICE {
+
+ ueCapabilityInformation-R1 UECapabilityInformation-MF,
+
+ spare15 NULL, spare14 NULL, spare13 NULL, spare12 NULL,
+
+ spare11 NULL, spare10 NULL, spare9 NULL, spare8 NULL,
+
+ spare7 NULL, spare6 NULL, spare5 NULL, spare4 NULL,
+
+ spare3 NULL, spare2 NULL, spare1 NULL
+
+ },
+
+ messageClassExtension SEQUENCE {}
+
+}
+
+
+
+
+
+MasterInformationBlock-MF ::= SEQUENCE {
+
+ dl-Bandwidth-R1 ENUMERATED {
+
+ n50, n100, spare6, spare5, spare4, spare3, spare2,
+spare1
+
+ },
+
+ systemFrameNumber-R1 BIT STRING (SIZE (8)),
+
+ sf-Offset-R1 INTEGER (0..4),
+
+ spare BIT STRING (SIZE (10))
+
+}
+
+
+
+
+
+RRCConnectionReconfiguration-MF ::= SEQUENCE {
+
+ rrc-TransactionIdentifier RRC-TransactionIdentifier OPTIONAL, -- Cond MF-SC
+
+ measConfig-R1 MeasConfig-MF OPTIONAL, -- Need ON
+
+ mobilityControlInfo-R1 MobilityControlInfo-MF OPTIONAL, -- Cond MF-HO
+
+ radioResourceConfigDedicated-R1 RadioResourceConfigDedicated-MF OPTIONAL, -- Need ON
+
+ sCellToAddModList-R1 SCellToAddModList-MF OPTIONAL, -- Need ON
+
+ sib-MF1-Dedicated-R1 OCTET STRING (CONTAINING
+SystemInformationBlockTypeMF1) OPTIONAL, -- Need ON
+
+ nonCriticalExtension SEQUENCE {} OPTIONAL
+
+}
+
+
+
+SCellToAddModList-MF ::= SEQUENCE (SIZE (1..maxSCell-r13)) OF SCellToAddMod-MF
+
+
+
+
+
+SCellToAddMod-MF ::= SEQUENCE {
+
+ sCellIndex-R1 SCellIndex-r13,
+
+ sCellDMTC-R1 MeasDS-Config-MF OPTIONAL, -- Need ON
+
+ radioResourceConfigCommonSCell-R1 RadioResourceConfigCommonSCell-MF OPTIONAL, -- Cond SCellAdd
+
+ radioResourceConfigDedicatedSCell-R1 RadioResourceConfigDedicatedSCell-MF OPTIONAL, -- Cond SCellAdd2
+
+ ...
+
+}
+
+
+
+
+
+RRCConnectionReestablishment-MF ::= SEQUENCE {
+
+ radioResourceConfigDedicated-R1 RadioResourceConfigDedicated-MF OPTIONAL, -- Need ON
+
+ nonCriticalExtension SEQUENCE {} OPTIONAL
+
+}
+
+
+
+
+
+RRCConnectionResume-MF ::= SEQUENCE {
+
+ measConfig-R1 MeasConfig-MF OPTIONAL, -- Need ON
+
+ radioResourceConfigDedicated-R1 RadioResourceConfigDedicated-MF OPTIONAL, -- Need ON
+
+ nonCriticalExtension SEQUENCE {} OPTIONAL
+
+}
+
+
+
+
+
+RRCConnectionSetup-MF ::= SEQUENCE {
+
+ radioResourceConfigDedicated-R1 RadioResourceConfigDedicated-MF OPTIONAL, -- Need ON
+
+ nonCriticalExtension SEQUENCE {} OPTIONAL
+
+}
+
+
+
+
+
+SystemInformation-MF ::= SEQUENCE {
+
+ si-3GPP-R1 OCTET STRING (CONTAINING SystemInformation)
+OPTIONAL,
+
+ si-IEs-R1 SystemInformation-R1-IEs
+OPTIONAL,
+
+ criticalExtensionsFuture SEQUENCE {}
+
+}
+
+
+
+SystemInformation-R1-IEs ::= SEQUENCE {
+
+ sib-TypeAndInfo-R1 SEQUENCE (SIZE (1..maxSIB-MF-R1)) OF CHOICE {
+
+ sib-MF2-R1 SystemInformationBlockTypeMF2,
+
+
+ sib-MF3-R1 SystemInformationBlockTypeMF3,
+
+ ...
+
+ } OPTIONAL,
+
+ sib-Ext-R1 SystemInformationBlockExt-MF OPTIONAL,
+
+ lateNonCriticalExtension OCTET STRING OPTIONAL,
+
+ nonCriticalExtension SEQUENCE {} OPTIONAL
+
+}
+
+
+
+SystemInformationBlockExt-MF ::= SEQUENCE {
+
+ intraFreqDMTC-R1 NeighCellDMTC-MF OPTIONAL, -- Cond SIB3-MF
+
+ interFreqDMTC-List-R1 InterFreqDMTC-List-MF OPTIONAL, -- Cond SIB5-MF
+
+ ...
+
+}
+
+
+
+InterFreqDMTC-List-MF ::= SEQUENCE (SIZE (1..maxFreq-R1)) OF NeighCellDMTC-MF
+
+
+
+
+
+SystemInformationBlockTypeMF1::= SEQUENCE {
+
+ sib1-R1 OCTET STRING (CONTAINING SystemInformationBlockType1),
+
+ sib2-R1 SystemInformationBlockType2,
+
+ altCellAccessInfoList-R1 AltCellAccessInfoList-MF OPTIONAL,
+
+ schedulingInfoList-R1 SchedulingInfoList-MF OPTIONAL, -- Need OR
+
+ servCellDMTC-R1 MeasDS-Config-MF,
+
+ nhn-Identity-R1 NHN-Identity-MF OPTIONAL,
+
+ psp-InfoSIB-MF1-R1 PSP-InfoSIB-MF1 OPTIONAL,
+
+ radioResourceConfigCommon-R1 RadioResourceConfigCommonSIB-MF OPTIONAL,
+
+
+ nonCriticalExtension SEQUENCE {} OPTIONAL
+
+}
+
+
+
+SchedulingInfoList-MF ::= SEQUENCE (SIZE (0.. maxSI-Message-1)) OF SchedulingInfo-MF
+
+
+
+SchedulingInfo-MF ::= SEQUENCE {
+
+ si-Periodicity-R1 ENUMERATED {rf8, rf16, rf32, rf64, rf128, rf256,
+rf512},
+
+ sib-MappingInfo-R1 SIB-MappingInfo-MF
+
+}
+
+
+
+
+
+SIB-MappingInfo-MF ::= SEQUENCE (SIZE (0..maxSIB-1)) OF CHOICE {
+
+ sib-Type-3GPP-R1 SIB-Type,
+
+ sib-Type-MF-R1 SIB-Type-MF
+
+}
+
+
+
+
+
+SIB-Type-MF ::= ENUMERATED {
+
+ sib-TypeMF2, sib-TypeMF3, ...
+
+ }
+
+
+
+
+
+UECapabilityEnquiry-MF ::= SEQUENCE {
+
+ rrc-TransactionIdentifier RRC-TransactionIdentifier OPTIONAL, -- Cond MF-SC
+
+ ue-CapabilityRequest-R1 ENUMERATED {true} OPTIONAL, -- Need ON
+
+ nonCriticalExtension SEQUENCE {} OPTIONAL
+
+}
+
+
+
+
+
+UECapabilityInformation-MF ::= SEQUENCE {
+
+ rrc-TransactionIdentifier RRC-TransactionIdentifier OPTIONAL, -- Cond MF-SC
+
+ ue-Capability-R1 UE-Capability-MF OPTIONAL,
+
+ nonCriticalExtension SEQUENCE {} OPTIONAL
+
+}
+
+
+
+
+
+SystemInformationBlockTypeMF2 ::= SEQUENCE {
+
+ psp-InfoSIB-MF2-R1 PSP-InfoSIB-MF2 OPTIONAL,
+
+ lateNonCriticalExtension OCTET STRING OPTIONAL,
+
+ ...
+
+}
+
+
+
+SystemInformationBlockTypeMF3 ::= SEQUENCE {
+
+ nhn-Name-R1 OCTET STRING (SIZE (1..256)) OPTIONAL,
+
+ osu-Support-R1 ENUMERATED {true} OPTIONAL,
+
+ lateNonCriticalExtension OCTET STRING OPTIONAL,
+
+ ...
+
+}
+
+
+
+
+
+CrossCarrierSchedulingConfig-UL-MF ::= SEQUENCE {
+
+
+
+ schedulingConfigInfo-R1 CHOICE {
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ schedulingCellId-R1 ServCellIndex-r13,
+
+ cif-InSchedulingCell-R1 INTEGER (1..7)
+
+ }
+
+ }
+
+}
+
+
+
+CQI-ReportConfig-MF ::= CHOICE{
+
+ release NULL,
+
+
+ setup SEQUENCE {
+
+ cqi-ReportPeriodic-R1 CQI-ReportPeriodic-MF OPTIONAL, -- Need ON
+
+ ...
+
+ }
+
+}
+
+
+
+
+
+CQI-ReportPeriodic-MF ::= CHOICE {
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ cqi-ConfigIndex-R1 INTEGER (0..74) OPTIONAL, -- Need ON
+
+ cqi-Trigger0-Window-R1 INTEGER (0..9)
+
+ }
+
+}
+
+
+
+
+
+PDCCH-Config-MF ::= SEQUENCE {
+
+ enableMonitoringDCI-Format0B-R1 CHOICE {
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ maxNumberOfSchedSubframes-Format0B-R1 ENUMERATED {sf2, sf3, sf4}
+
+ }
+
+ } OPTIONAL, -- Need ON
+
+ enableMonitoringDCI-Format4B-R1 CHOICE {
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ maxNumberOfSchedSubframes-Format4B-R1 ENUMERATED {sf2, sf3, sf4}
+
+ }
+
+ } OPTIONAL, -- Need ON
+
+ skipMonitoringDCI-Format0A-R1 ENUMERATED {true} OPTIONAL, -- Need OR
+
+ skipMonitoringDCI-Format4A-R1 ENUMERATED {true} OPTIONAL, -- Need OR
+
+ pdcch-CandidateReductions-Format0A-R1
+
+ PDCCH-CandidateReductions-r13 OPTIONAL, -- Need ON
+
+ pdcch-CandidateReductions-Format4A-R1
+
+ PDCCH-CandidateReductions-UL-MF OPTIONAL, -- Need ON
+
+ pdcch-CandidateReductions-Format0B-R1
+
+ PDCCH-CandidateReductions-UL-MF OPTIONAL, -- Need ON
+
+ pdcch-CandidateReductions-Format4B-R1
+
+ PDCCH-CandidateReductions-UL-MF OPTIONAL -- Need ON
+
+}
+
+
+
+PDCCH-CandidateReductions-UL-MF ::= CHOICE {
+
+ release NULL,
+
+ setup SEQUENCE {
+
+
+ pdcch-candidateReductionAL1-R1 PDCCH-CandidateReductionValue-r13,
+
+ pdcch-candidateReductionAL2-R1 PDCCH-CandidateReductionValue-r13,
+
+ pdcch-candidateReductionAL3-R1 PDCCH-CandidateReductionValue-MF,
+
+ pdcch-candidateReductionAL4-R1 PDCCH-CandidateReductionValue-MF,
+
+ pdcch-candidateReductionAL5-R1 PDCCH-CandidateReductionValue-MF
+
+ }
+
+}
+
+
+
+PDCCH-CandidateReductionValue-MF ::= ENUMERATED {n0, n50, n100, n150}
+
+
+
+
+
+PhysicalConfigDedicated-MF ::= SEQUENCE {
+
+ physicalConfigDedicated-R1 PhysicalConfig-MF,
+
+ schedulingRequestConfig-R1 SchedulingRequestConfig-MF OPTIONAL, -- Need ON
+
+ ...
+
+}
+
+
+
+PhysicalConfigDedicatedSCell-MF ::= SEQUENCE {
+
+ physicalConfigDedicatedSCell-R1 PhysicalConfig-MF,
+
+ schedulingRequestConfigSCell-R1 SchedulingRequestConfigSCell-MF OPTIONAL, -- Need ON
+
+ crossCarrierSchedulingConfigUL-R1 CrossCarrierSchedulingConfig-UL-MF OPTIONAL, -- Cond Cross-Carrier-ConfigUL-MF
+
+ ...
+
+}
+
+
+
+PhysicalConfig-MF ::= SEQUENCE {
+
+ soundingRS-UL-ConfigTrigger0or1-R1 SoundingRS-UL-ConfigDedicated-MF OPTIONAL, -- Need ON
+
+ pucch-ConfigDedicated-R1 PUCCH-ConfigDedicated-MF OPTIONAL, -- Need ON
+
+ lbt-Config-R1 LBT-Config-MF OPTIONAL, -- Need ON
+
+ absenceOfAnyOtherTechnology-R1 ENUMERATED {true} OPTIONAL, -- Need OR
+
+ cqi-ReportConfig-R1 CQI-ReportConfig-MF OPTIONAL, -- Need ON
+
+ pdcch-Config-R1 PDCCH-Config-MF OPTIONAL, -- Need ON
+
+
+ pucch-ConfigHarqAckProcesses-R1 INTEGER (1..16) OPTIONAL, -- Need ON
+
+ physicalChannelMappingList-R1 PhysicalChannelMappingList-MF,
+
+ spucch-SpatialBundlingConfig-R1 BOOLEAN,
+
+ non-SPUCCH-SpatialBundlingConfig-R1 BOOLEAN,
+
+ spucch-NumInterlaces-R1 INTEGER (1..2),
+
+ epucch-NumInterlaces-R1 INTEGER (1..2),
+
+ ...
+
+}
+
+
+
+LBT-Config-MF ::= CHOICE {
+
+ maxEnergyDetectionThreshold-R1 INTEGER (-85..-52),
+
+ energyDetectionThresholdOffset-R1 INTEGER (-13..20)
+
+}
+
+
+
+
+
+PhysicalChannelMappingList-MF ::= SEQUENCE {
+
+ spucch-CellList-R1 CellIndexList-MF OPTIONAL, -- Need ON
+
+ epucch-TriggeredCellList-R1 CellIndexList-MF OPTIONAL, -- Need ON
+
+ epucch-ScheduledCellList-R1 CellIndexList-MF OPTIONAL, -- Need ON
+
+ pusch-WithUL-SCH-CellList-R1 CellIndexList-MF OPTIONAL, -- Need ON
+
+ pusch-WithoutUL-SCH-CellList-R1 CellIndexList-MF OPTIONAL, -- Need ON
+
+
+ cqi-ReportPeriodic-CellList-R1 CellIndexList-MF OPTIONAL -- Need ON
+
+}
+
+
+
+CellIndexList-MF ::= SEQUENCE (SIZE (1..32)) OF ServCellIndex-r13
+
+
+
+
+
+
+
+PRACH-Config-MF ::= SEQUENCE {
+
+ prach-LBT-R1 ENUMERATED {true} OPTIONAL, -- Need OR
+
+ prach-FreqIndex-R1 BIT STRING (SIZE (10)),
+
+ prach-NumInterlaces-R1 ENUMERATED {oneInterlacePerSPRACH, twoInterlacesPerSPRACH}
+
+}
+
+
+
+
+
+PUCCH-ConfigCommon-MF ::= SEQUENCE {
+
+ spucch-LBT-R1 ENUMERATED {enabled} OPTIONAL, -- Need OR
+
+ ...
+
+}
+
+
+
+PUCCH-ConfigDedicated-MF ::= CHOICE{
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ spucch-ConfigDedicated-R1 SPUCCH-ConfigDedicated-MF OPTIONAL, -- Need ON
+
+ epucch-ConfigDedicated-R1 EPUCCH-ConfigDedicated-MF OPTIONAL -- Need ON
+
+ }
+
+}
+
+
+
+
+
+SPUCCH-ConfigDedicated-MF ::= CHOICE {
+
+ release NULL,
+
+
+ setup SEQUENCE {
+
+ spucch-AN-List-R1 CHOICE {
+
+ n1-SPUCCH-AN-List-R1 SEQUENCE (SIZE (1..4)) OF SPUCCH-Format1-ResourceIndex-MF,
+
+ n2-SPUCCH-AN-List-R1 SEQUENCE (SIZE (1..4)) OF SPUCCH-Format2-ResourceIndex-MF,
+
+ n3-SPUCCH-AN-List-R1 SEQUENCE (SIZE (1..4)) OF SPUCCH-Format3-ResourceIndex-MF
+
+ }
+
+ }
+
+}
+
+
+
+
+
+SPUCCH-Format0-ResourceIndex-MF ::= INTEGER (0..479)
+
+SPUCCH-Format1-ResourceIndex-MF ::= INTEGER (0..19)
+
+SPUCCH-Format2-ResourceIndex-MF ::= INTEGER (0..39)
+
+SPUCCH-Format3-ResourceIndex-MF ::= INTEGER (0..119)
+
+EPUCCH-Format1-ResourceIndex-MF ::= INTEGER (0..49)
+
+
+
+
+
+EPUCCH-ConfigDedicated-MF ::= CHOICE{
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ epucch-AN-List-R1 SEQUENCE (SIZE (1..4)) OF EPUCCH-Format1-ResourceIndex-MF
+
+ }
+
+}
+
+
+
+
+
+
+
+RadioResourceConfigCommonSIB-MF ::= SEQUENCE {
+
+ rach-ConfigCommon-R1 RACH-ConfigCommon-MF,
+
+ pcch-Config-R1 PCCH-Config-MF,
+
+ pucch-Config-R1 PUCCH-ConfigCommon-MF,
+
+ prach-Config-R1 PRACH-Config-MF,
+
+ commonTimingAdvanceOffset-R1 CommonTimingAdvanceOffset-MF OPTIONAL, -- Need ON
+
+ srs-trigger2Config-R1 SoundingRS-UL-ConfigImplicit-MF OPTIONAL, -- Need ON
+
+ ...
+
+}
+
+
+
+RadioResourceConfigCommon-MF ::= SEQUENCE {
+
+ servCellDMTC-R1 MeasDS-Config-MF OPTIONAL, -- Need ON
+
+ rach-ConfigCommon-R1 RACH-ConfigCommon-MF OPTIONAL, -- Need ON
+
+ pucch-Config-R1 PUCCH-ConfigCommon-MF OPTIONAL, -- Need ON
+
+ prach-Config-R1 PRACH-Config-MF,
+
+
+ commonTimingAdvanceOffset-R1 CommonTimingAdvanceOffset-MF OPTIONAL, -- Need ON
+
+ srs-trigger2Config-R1 SoundingRS-UL-ConfigImplicit-MF OPTIONAL, -- Need ON
+
+ ...
+
+}
+
+
+
+RadioResourceConfigCommonSCell-MF ::= SEQUENCE {
+
+ rach-ConfigCommon-R1 RACH-ConfigCommon-MF OPTIONAL, -- Need ON
+
+ pucch-Config-R1 PUCCH-ConfigCommon-MF OPTIONAL, -- Need ON
+
+ prach-Config-R1 PRACH-Config-MF,
+
+ srs-trigger2Config-R1 SoundingRS-UL-ConfigImplicit-MF OPTIONAL, -- Need ON
+
+ ...
+
+}
+
+
+
+
+
+PCCH-Config-MF ::= SEQUENCE {
+
+ pow-Size-R1 INTEGER (1..maxPOW-Size-R1),
+
+ pagelessSubframesToMonitor-R1 INTEGER (1..maxPOW-Size-R1),
+
+ ...
+
+}
+
+
+
+RACH-ConfigCommon-MF ::= SEQUENCE {
+
+ ra-ResponseWindowSize-R1 ENUMERATED {sf2, sf3, sf4, sf5, sf6, sf7, sf8, sf10,
+sf20},
+
+ ...
+
+}
+
+
+
+CommonTimingAdvanceOffset-MF ::= ENUMERATED {
+
+ cta0, cta1, cta2, cta3, cta4, cta5, cta6, cta7,
+cta8,
+
+ cta9, cta10, cta11, cta12, cta13, spare2, spare1}
+
+
+
+
+
+RadioResourceConfigDedicated-MF ::= SEQUENCE {
+
+ physicalConfigDedicated-R1 PhysicalConfigDedicated-MF OPTIONAL, -- Need ON
+
+ ...
+
+}
+
+
+
+RadioResourceConfigDedicatedSCell-MF ::= SEQUENCE {
+
+ physicalConfigDedicated-R1 PhysicalConfigDedicatedSCell-MF OPTIONAL, -- Need ON
+
+
+ ...
+
+}
+
+
+
+
+
+SchedulingRequestConfig-MF ::= CHOICE {
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ sr-SPUCCH-ResourceIndex-R1 SPUCCH-Format0-ResourceIndex-MF,
+
+ sr-Trigger0-Window-R1 INTEGER (0..9)
+
+ }
+
+}
+
+
+
+SchedulingRequestConfigSCell-MF ::= CHOICE {
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ sr-ConfigSCell-R1 SchedulingRequestConfig-MF OPTIONAL, -- Need OR
+
+ sr-PRACH-ConfigSCell-R1 PRACH-Config-MF OPTIONAL -- Need OR
+
+ }
+
+}
+
+
+
+
+
+
+
+SoundingRS-UL-ConfigDedicated-MF ::= CHOICE{
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ cyclicShift-R1 ENUMERATED {
+
+ cs0, cs1, cs2, cs3, cs4, cs5, cs6, cs7, cs8,
+cs9,
+
+ cs10, cs11},
+
+ transmissionSRS-OCC-Index-R1 INTEGER (0..3),
+
+ freqIndex-R1 BIT STRING (SIZE (10)),
+
+ srs-AntennaPort-R1 SRS-AntennaPort,
+
+ srs-SubframeIndication-R1 INTEGER (1..4) OPTIONAL, -- Need ON
+
+ srs-ConfigIndex-R1 INTEGER (0..1023) OPTIONAL
+
+ }
+
+}
+
+
+
+
+
+
+SoundingRS-UL-ConfigImplicit-MF ::= CHOICE{
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ cyclicShift-R1 ENUMERATED {
+
+ cs0, cs1, cs2, cs3, cs4, cs5, cs6, cs7, cs8,
+cs9,
+
+ cs10, cs11},
+
+ transmissionSRS-OCC-Index-R1 INTEGER (0..3),
+
+ freqIndex-R1 INTEGER (0..9),
+
+ srs-AntennaPort-R1 SRS-AntennaPort
+
+ }
+
+}
+
+
+
+
+
+
+
+AltCellAccessInfoList-MF ::= SEQUENCE (SIZE (1..maxPLMN-r11-Minus1-R1)) OF AltCellAccessInfo-MF
+
+
+
+AltCellAccessInfo-MF ::= SEQUENCE {
+
+ plmn-IdentityInfo-R1 PLMN-IdentityInfo,
+
+ trackingAreaCode-R1 TrackingAreaCode OPTIONAL, -- Cond firstEntry
+
+ cellIdentity-R1 CellIdentity OPTIONAL, -- Cond firstEntry
+
+ csg-Indication-R1 BOOLEAN OPTIONAL, -- Cond firstEntry
+
+ csg-Identity-R1 CSG-Identity OPTIONAL -- Need OR
+
+}
+
+
+
+MobilityControlInfo-MF ::= SEQUENCE {
+
+ radioResourceConfigCommon-R1 RadioResourceConfigCommon-MF,
+
+ ...
+
+}
+
+
+
+
+
+NHN-Identity-MF ::= BIT STRING (SIZE(40))
+
+
+
+
+
+PSP-InfoSIB-MF1 ::= SEQUENCE {
+
+ plmn-PSP-InfoList-R1 SEQUENCE (SIZE (1..maxPSP-SIB-MF1-R1)) OF PLMN-PSP-Info-MF
+OPTIONAL,
+
+
+ oid-PSP-InfoList-R1 SEQUENCE (SIZE (1..maxPSP-SIB-MF1-R1)) OF OID-PSP-Info-MF
+OPTIONAL,
+
+ hashPSP-InfoList-R1 SEQUENCE (SIZE (1..maxPSP-SIB-MF1-R1)) OF HashPSP-Info-MF
+OPTIONAL,
+
+ ...
+
+}
+
+
+
+PSP-InfoSIB-MF2 ::= SEQUENCE {
+
+ plmn-PSP-InfoList-R1 SEQUENCE (SIZE (1..maxPSP-SIB-MF2-R1)) OF PLMN-PSP-Info-MF
+OPTIONAL,
+
+ oid-PSP-InfoList-R1 SEQUENCE (SIZE (1..maxPSP-SIB-MF2-R1)) OF OID-PSP-Info-MF
+OPTIONAL,
+
+ hashPSP-InfoList-R1 SEQUENCE (SIZE (1..maxPSP-SIB-MF2-R1)) OF HashPSP-Info-MF
+OPTIONAL,
+
+ ...
+
+}
+
+
+
+PLMN-PSP-Info-MF ::= SEQUENCE {
+
+ psp-Identity-R1 PSP-Identity-MF,
+
+ s2a-Support-R1 ENUMERATED {true} OPTIONAL
+
+}
+
+
+
+OID-PSP-Info-MF ::= PSP-Identity-MF
+
+
+
+HashPSP-Info-MF ::= PSP-Identity-MF
+
+
+
+PSP-Identity-MF ::= BIT STRING (SIZE(24))
+
+
+
+
+
+MeasConfig-MF ::= SEQUENCE {
+
+ measGapConfig-R1 MeasGapConfig-MF OPTIONAL, -- Need ON
+
+ measObjectToAddModList-R1 MeasObjectToAddModList-MF OPTIONAL, -- Need ON
+
+ ...
+
+}
+
+
+
+
+
+MeasDS-Config-MF ::= CHOICE {
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ dmtc-Periodicity-R1 ENUMERATED {ms40, ms80, ms160} OPTIONAL, -- Cond servCell
+
+ dmtc-Offset-R1 INTEGER(0..159) OPTIONAL, -- Cond servCell
+
+ dmtc-WindowSize-R1 INTEGER(1..10) OPTIONAL, -- Cond servCell
+
+
+
+ measCSI-RS-ToRemoveList-R1 MeasCSI-RS-ToRemoveList-r12 OPTIONAL, -- Need ON
+
+ measCSI-RS-ToAddModList-R1 MeasCSI-RS-ToAddModList-r12 OPTIONAL, -- Need ON
+
+ ...
+
+ }
+
+}
+
+
+
+
+
+MeasGapConfig-MF ::= CHOICE {
+
+
+ release NULL,
+
+ setup SEQUENCE {
+
+ gapOffset-R1 CHOICE {
+
+ gp0-R1 INTEGER (0..48),
+
+ gp1-R1 INTEGER (0..88)
+
+ },
+
+ gapLength-R1 ENUMERATED {ms6, ms8, ms10, spare},
+
+ gapShiftFactor-R1 INTEGER (-1..1),
+
+ ...
+
+ }
+
+}
+
+
+
+
+
+MeasObjectToAddModList-MF ::= SEQUENCE (SIZE (1.. maxObjectId-r13)) OF MeasObjectToAddMod-MF
+
+
+
+MeasObjectToAddMod-MF ::= SEQUENCE {
+
+ measObjectId-R1 MeasObjectId-r13,
+
+ neighCellDMTC-R1 NeighCellDMTC-MF OPTIONAL,
+
+ ...
+
+}
+
+
+
+
+
+NeighCellDMTC-MF ::= SEQUENCE {
+
+ asyncNeighCells-R1 BOOLEAN,
+
+ measDS-ConfigAsync-R1 MeasDS-Config-MF OPTIONAL, -- Cond async
+
+ measDS-ConfigSync-R1 MeasDS-Config-MF OPTIONAL -- Need ON
+
+
+}
+
+
+
+
+
+UE-Capability-MF ::= SEQUENCE {
+
+ accessStratumRelease-R1 AccessStratumRelease-MF,
+
+ phyLayerParameters-R1 PhyLayerParameters-MF,
+
+ mobilityParameters-R1 MobilityParameters-MF,
+
+ ue-EUTRA-LikeCapabilities-R1 OCTET STRING (CONTAINING UE-EUTRA-Capability),
+
+ nonCriticalExtension UE-Capability-MF-V102 OPTIONAL
+
+}
+
+
+
+UE-Capability-MF-V102 ::= SEQUENCE {
+
+ phyLayerParameters-R1 PhyLayerParameters-MF-V102,
+
+ nonCriticalExtension
+
+SEQUENCE {} OPTIONAL
+
+}
+
+
+
+AccessStratumRelease-MF ::= ENUMERATED {mf100, spare3, spare2, spare1, ...}
+
+
+
+PhyLayerParameters-MF ::= SEQUENCE {
+
+ twoStepSchedulingTimingInfo-R1 ENUMERATED {nPlus1, nPlus2, nPlus3, spare} DEFAULT
+nPlus3,
+
+ monitorTwoSF-Scramblings-R1 ENUMERATED {supported} OPTIONAL,
+
+ pucch-OnAllServCells-R1 ENUMERATED {supported} OPTIONAL,
+
+ multipleSR-Opportunity-R1 ENUMERATED {supported} OPTIONAL
+
+}
+
+
+
+PhyLayerParameters-MF-V102 ::= SEQUENCE {
+
+ uss-BlindDecodingAdjustment-R1 ENUMERATED {supported} OPTIONAL,
+
+ uss-BlindDecodingReduction-R1 ENUMERATED {supported} OPTIONAL,
+
+ outOfSequenceGrantHandling-R1 ENUMERATED {supported} OPTIONAL
+
+}
+
+
+
+MobilityParameters-MF ::= SEQUENCE {
+
+
+ mobilityToEUTRA-Support-R1 ENUMERATED {mfToTddOnly, mfToFddOnly, mfToTddOrFdd,
+spare},
+
+ mobilityToOtherMF-BandSupport-R1 ENUMERATED {supported} OPTIONAL
+
+}
+
+
+
+
+
+maxFreq-R1 INTEGER ::= 16 -- Maximum number of carrier frequencies
+
+maxPLMN-r11-Minus1-R1 INTEGER ::= 5 -- Maximum number of PLMNs in AltCellAccessInfo
+
+maxPOW-Size-R1 INTEGER ::= 10 -- Maximum number of paging subframes in POW
+
+maxPSP-SIB-MF1-R1 INTEGER ::= 32 -- Maximum number of PSPs in PSP-list
+
+maxPSP-SIB-MF2-R1 INTEGER ::= 128 -- Maximum number of PSPs in additional PSP-list
+
+maxSIB-MF-R1 INTEGER ::= 16 -- Maximum number of SIB-MFs
+
+maxSI-Message-1 INTEGER ::= 31 -- Maximum number of SchedulingInfo-MFs
+
+
+
+
+
+END
+
+
+
+
+

@@ -112,7 +112,10 @@ FROM S1AP-CommonDataTypes
     ConnectionEstablishmentIndication,
     NASDeliveryIndication,
     RetrieveUEInformation,
-    UEInformationTransfer
+    UEInformationTransfer,
+    ENBCPRelocationIndication,
+    MMECPRelocationIndication,
+    SecondaryRATDataUsageReport
 
 
 FROM S1AP-PDU-Contents
@@ -176,7 +179,10 @@ FROM S1AP-PDU-Contents
     id-ConnectionEstablishmentIndication,
     id-NASDeliveryIndication,
     id-RetrieveUEInformation,
-    id-UEInformationTransfer
+    id-UEInformationTransfer,
+    id-eNBCPRelocationIndication,
+    id-MMECPRelocationIndication,
+    id-SecondaryRATDataUsageReport
 
 
 FROM S1AP-Constants;
@@ -312,7 +318,10 @@ S1AP-ELEMENTARY-PROCEDURES-CLASS-2 S1AP-ELEMENTARY-PROCEDURE ::= {
     connectionEstablishmentIndication   |
     nASDeliveryIndication           |
     retrieveUEInformation           |
-    uEInformationTransfer
+    uEInformationTransfer           |
+    eNBCPRelocationIndication                   |
+    mMECPRelocationIndication       |
+    secondaryRATDataUsageReport
 }
 
 -- **************************************************************
@@ -707,6 +716,24 @@ uEInformationTransfer S1AP-ELEMENTARY-PROCEDURE ::= {
     INITIATING MESSAGE      UEInformationTransfer
     PROCEDURE CODE          id-UEInformationTransfer
     CRITICALITY             reject
+}
+
+eNBCPRelocationIndication S1AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE      ENBCPRelocationIndication
+    PROCEDURE CODE          id-eNBCPRelocationIndication
+    CRITICALITY             reject
+}
+
+mMECPRelocationIndication S1AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE      MMECPRelocationIndication
+    PROCEDURE CODE          id-MMECPRelocationIndication
+    CRITICALITY             reject
+}
+
+secondaryRATDataUsageReport S1AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE      SecondaryRATDataUsageReport
+    PROCEDURE CODE          id-SecondaryRATDataUsageReport
+    CRITICALITY         ignore
 }
 
 

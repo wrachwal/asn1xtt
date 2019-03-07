@@ -1,0 +1,35 @@
+EUTRA-UE-Variables-MF DEFINITIONS AUTOMATIC TAGS ::=
+
+
+
+BEGIN
+
+
+
+IMPORTS
+
+ MeasObjectToAddModList-MF
+
+
+
+
+FROM EUTRA-RRC-Definitions-MF;
+
+
+
+
+
+VarMeasConfig-MF ::= SEQUENCE {
+
+ measObjectToAddModList-R1 MeasObjectToAddModList-MF OPTIONAL
+
+}
+
+
+
+
+
+END
+
+
+

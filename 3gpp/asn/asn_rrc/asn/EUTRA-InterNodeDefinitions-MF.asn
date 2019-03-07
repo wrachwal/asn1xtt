@@ -1,0 +1,66 @@
+EUTRA-InterNodeDefinitions-MF DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+
+IMPORTS
+    HandoverCommand-r8-IEs,
+    HandoverPreparationInformation-r8-IEs
+FROM EUTRA-InterNodeDefinitions
+
+    DL-DCCH-Message-MF,
+    MasterInformationBlock-MF,
+    MeasConfig-MF,
+    SCellToAddModList-MF,
+    RadioResourceConfigDedicated-MF,
+    SystemInformationBlockTypeMF1,
+    UE-Capability-MF
+FROM EUTRA-RRC-Definitions-MF;
+
+HandoverCommand-MF ::= SEQUENCE {
+    criticalExtensions CHOICE {
+        c1 CHOICE{
+            handoverCommand-r8 HandoverCommand-r8-IEs,
+            spare7 NULL,
+            spare6 NULL, spare5 NULL, spare4 NULL,
+            spare3 NULL, spare2 NULL,
+            handoverCommand-R1 HandoverCommand-R1-IEs
+        },
+        criticalExtensionsFuture SEQUENCE {}
+    }
+}
+
+HandoverCommand-R1-IEs ::= SEQUENCE {
+    handoverCommandMessage-R1 OCTET STRING (CONTAINING DL-DCCH-Message-MF),
+    nonCriticalExtension SEQUENCE {} OPTIONAL
+}
+
+HandoverPreparationInformation-MF ::= SEQUENCE {
+    criticalExtensions CHOICE {
+        c1 CHOICE{
+            handoverPreparationInformation-r8 HandoverPreparationInformation-r8-IEs,
+            spare7 NULL,
+            spare6 NULL, spare5 NULL, spare4 NULL,
+            spare3 NULL, spare2 NULL,
+            handoverPreparationInformation-R1 HandoverPreparationInformation-R1-IEs
+        },
+        criticalExtensionsFuture SEQUENCE {}
+    }
+}
+
+HandoverPreparationInformation-R1-IEs ::= SEQUENCE {
+    handoverPreparation-3GPP-R1 OCTET STRING (CONTAINING HandoverPreparationInformation-r8-IEs),
+    ue-RadioAccessCapabilityInfo-R1 UE-Capability-MF,
+    as-Config-R1 AS-Config-MF OPTIONAL, -- Cond HO
+    nonCriticalExtension SEQUENCE {} OPTIONAL
+}
+
+AS-Config-MF ::= SEQUENCE {
+    sourceMeasConfig-R1 MeasConfig-MF,
+    sourceRadioResourceConfig-R1 RadioResourceConfigDedicated-MF,
+    sourceSCellConfigList-R1 SCellToAddModList-MF OPTIONAL,
+    sourceMasterInformationBlock-R1 MasterInformationBlock-MF,
+    sourceSystemInformationBlockTypeMF1-R1 OCTET STRING (CONTAINING SystemInformationBlockTypeMF1),
+    ...
+}
+
+END
+

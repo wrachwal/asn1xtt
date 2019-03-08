@@ -25,6 +25,21 @@ Rec2 ::= SEQUENCE {
     }
 }
 
+Def3 ::= Rec3
+
+Rec3 ::= SEQUENCE {
+    a SEQUENCE {
+        b SEQUENCE {
+            c SEQUENCE {
+                x INTEGER,
+                y INTEGER
+            }
+        }
+    },
+    ...,
+    d INTEGER
+}
+
 WeekDay ::= ENUMERATED { mon(1), tue(2), wed(3), thu(4), fri(5), sat(6), sun(7) }
 
 Dim3 ::= SEQUENCE OF SEQUENCE OF SEQUENCE OF CHOICE {
@@ -33,12 +48,15 @@ Dim3 ::= SEQUENCE OF SEQUENCE OF SEQUENCE OF CHOICE {
         y INTEGER
     },
     vec Vec,
-    day WeekDay
+    day WeekDay,
+    rem Telework
 }
 
 Vec ::= SEQUENCE {
     x INTEGER,
     y INTEGER
 }
+
+Telework ::= SEQUENCE OF WeekDay
 
 END

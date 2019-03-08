@@ -241,6 +241,9 @@ defmodule ASN.CTT do
   @scalar1 [:INTEGER, :BOOLEAN, :"OCTET STRING", :NULL]
   @scalar2 [:ENUMERATED, :"BIT STRING"]
 
+  def scalar1, do: @scalar1
+  def scalar2, do: @scalar2
+
   def search_field(db, node, goal) do
     search_field(db, node, goal, [], [])
     |> Enum.reverse()

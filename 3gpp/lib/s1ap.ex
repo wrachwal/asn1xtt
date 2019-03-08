@@ -4,8 +4,9 @@ defmodule S1AP do
   require ASN.CTT
   require Record
 
+  @external_resource asn1db = Path.join(srcdir, "asn_s1ap.asn1db")
   # generate `db/1`
-  ASN.CTT.burn_asn1db(Path.join(srcdir, "asn_s1ap.asn1db"), :db)
+  ASN.CTT.burn_asn1db(asn1db, :db)
   # summary
   |> Keyword.values()
   |> Enum.filter(&Record.is_record/1)

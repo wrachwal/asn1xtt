@@ -2,7 +2,8 @@ srcdir = Path.join(__DIR__, "../asn/asn_dev/src")
 
 defmodule Dev.ASN do
   require ASN.CTT
-  rec2kv = ASN.CTT.burn_record(Path.join(srcdir, "asn_dev.hrl"))
+  @external_resource hrl = Path.join(srcdir, "asn_dev.hrl")
+  rec2kv = ASN.CTT.burn_record(hrl)
   def record do
     unquote(Keyword.keys(rec2kv))
   end
@@ -17,8 +18,9 @@ defmodule Dev do
   require ASN.CTT
   require Record
 
+  @external_resource asn1db = Path.join(srcdir, "asn_dev.asn1db")
   # generate `db/1`
-  ASN.CTT.burn_asn1db(Path.join(srcdir, "asn_dev.asn1db"), :db)
+  ASN.CTT.burn_asn1db(asn1db, :db)
   # summary
   |> Keyword.values()
   |> Enum.filter(&Record.is_record/1)

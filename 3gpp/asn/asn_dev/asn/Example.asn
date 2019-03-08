@@ -1,7 +1,7 @@
 Example DEFINITIONS AUTOMATIC TAGS ::=
 BEGIN
 
--- 1.3.6 Naming of Records in .hrl Files
+-- [3.6  Naming of Records in .hrl Files](http://erlang.org/doc/apps/asn1/asn1_getting_started.html#naming-of-records-in-.hrl-files)
 
 -- -record('Rec1_a_b',{c}).
 

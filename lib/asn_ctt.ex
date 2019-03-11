@@ -12,6 +12,7 @@ defmodule ASN.CTT do
                       valuedef: nil,
                       ptypedef: nil,
                       type: nil,
+                      simpletableattributes: :simpletabattrs,
                       SEQUENCE: :sequence,
                       Object: :object,
                       ObjectSet: :objectset,

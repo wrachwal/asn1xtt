@@ -4,6 +4,10 @@ defmodule ASN.CDB do
   @scalar1 ASN.CTT.scalar1()
   @scalar2 ASN.CTT.scalar2()
 
+  def scalar?(scalar) when scalar in @scalar1, do: true
+  def scalar?({scalar, _}) when scalar in @scalar2, do: true
+  def scalar?(_other), do: false
+
   def explore(db, type) when is_atom(type) do
     %{}
     |> explore(db, type)
@@ -32,10 +36,6 @@ defmodule ASN.CDB do
     |> Map.put_new(:__REF__, %{})
     |> exp(db.(type), [])
   end
-
-  defp scalar?(scalar) when scalar in @scalar1, do: true
-  defp scalar?({scalar, _}) when scalar in @scalar2, do: true
-  defp scalar?(_other), do: false
 
   defp tref(%{__REF__: tref} = map, type) do
     tref = Map.update(tref, type, -1, fn

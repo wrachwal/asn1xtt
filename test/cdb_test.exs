@@ -3,6 +3,12 @@ defmodule AsnCdbTest do
 
   alias ASN.CDB
 
+  defp typedef_scalar?(db, type) do
+    import ASN.CTT, only: :macros
+    typedef(typespec: type(def: type)) = db.(type)
+    CDB.scalar?(type)
+  end
+
   test "explore/2 -- Dev" do
     db = &Dev.db/1
     CDB.explore(db, :Rec1)
@@ -42,8 +48,15 @@ defmodule AsnCdbTest do
       tref
       |> Enum.filter(&(elem(&1, 1) == 1))
       |> Enum.map(&elem(&1, 0))
+      |> Enum.reject(&typedef_scalar?(db, &1))
       |> Enum.sort()
-    IO.inspect roots, limit: :infinity
+    # |> IO.inspect(limit: :infinity, label: "ROOTS")
+    assert length(roots) == 81
+  end
+
+  test "explore/2 -- S1AP" do
+    db = &S1AP.db/1
+    CDB.explore(db, :"S1AP-PDU")
   end
 
 end

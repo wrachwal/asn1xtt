@@ -100,7 +100,7 @@ defmodule AsnCttTest do
       :"VarRLF-Report-r10", :"VarRLF-Report-r11", :"VarShortINACTIVE-MAC-Input-r15", :"VarShortMAC-Input-NB-r13",
       :"VarShortResumeMAC-Input-NB-r13", :"VarWLAN-MobilityConfig",
       :"VarWLAN-Status-r13"
-    ]
+    ] #XXX length = 81
   end
 
   test "__typedef__ and __valuedef__ are in order as in .asn" do

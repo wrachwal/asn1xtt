@@ -3,7 +3,9 @@ defmodule AsnCdbS1X2Test do
 
   test "S1AP elementary_procedures/2" do
     s1ap = &S1AP.db/1
-    assert ASN.CDB.S1X2.elementary_procedures(s1ap, :"S1AP-ELEMENTARY-PROCEDURES") |> Enum.map(&Map.fetch!(&1, :msg_type)) == [
+    assert s1ap
+      |> ASN.CDB.S1X2.elementary_procedures(:"S1AP-ELEMENTARY-PROCEDURES")
+      |> Enum.map(&Map.fetch!(&1, :msg_type)) == [
       :HandoverRequired, :HandoverCommand, :HandoverPreparationFailure,
       :HandoverRequest, :HandoverRequestAcknowledge, :HandoverFailure,
       :HandoverNotify, :PathSwitchRequest, :PathSwitchRequestAcknowledge,
@@ -44,7 +46,9 @@ defmodule AsnCdbS1X2Test do
 
   test "X2AP elementary_procedures/2" do
     x2ap = &X2AP.db/1
-    assert ASN.CDB.S1X2.elementary_procedures(x2ap, :"X2AP-ELEMENTARY-PROCEDURES") |> Enum.map(&Map.fetch!(&1, :msg_type)) == [
+    assert x2ap
+      |> ASN.CDB.S1X2.elementary_procedures(:"X2AP-ELEMENTARY-PROCEDURES")
+      |> Enum.map(&Map.fetch!(&1, :msg_type)) == [
       :HandoverRequest, :HandoverRequestAcknowledge, :HandoverPreparationFailure,
       :HandoverCancel, :LoadInformation, :ErrorIndication, :SNStatusTransfer,
       :UEContextRelease, :X2SetupRequest, :X2SetupResponse, :X2SetupFailure,
@@ -80,6 +84,41 @@ defmodule AsnCdbS1X2Test do
       :ENDCX2RemovalRequest, :ENDCX2RemovalResponse, :ENDCX2RemovalFailure,
       :DataForwardingAddressIndication, :GNBStatusIndication
     ]
+  end
+
+  test "S1AP ies" do
+    s1ap = &S1AP.db/1
+    msg_types =
+      s1ap
+      |> ASN.CDB.S1X2.elementary_procedures(:"S1AP-ELEMENTARY-PROCEDURES")
+      |> Enum.map(&Map.fetch!(&1, :msg_type))
+    msg_ies =
+      for type <- msg_types, into: %{} do
+        {type, ASN.CDB.S1X2.message_ies(s1ap, type)}
+      end
+    assert [
+      %{id: :"id-eNB-UE-S1AP-ID",  criticality: :reject, type: :"ENB-UE-S1AP-ID",  presence: :mandatory},
+      %{id: :"id-MME-UE-S1AP-ID",  criticality: :ignore, type: :"MME-UE-S1AP-ID",  presence: :optional},
+      %{id: :"id-S1-Message",      criticality: :reject, type: :"OCTET STRING",    presence: :mandatory},
+      %{id: :"id-MME-Group-ID",    criticality: :reject, type: :"MME-Group-ID",    presence: :mandatory},
+      %{id: :"id-Additional-GUTI", criticality: :ignore, type: :"Additional-GUTI", presence: :optional},
+      %{id: :"id-UE-Usage-Type",   criticality: :ignore, type: :"UE-Usage-Type",   presence: :optional}
+    ] = Map.fetch!(msg_ies, :RerouteNASRequest)
+  end
+
+  test "X2AP ies" do
+    x2ap = &X2AP.db/1
+    msg_types =
+      x2ap
+      |> ASN.CDB.S1X2.elementary_procedures(:"X2AP-ELEMENTARY-PROCEDURES")
+      |> Enum.map(&Map.fetch!(&1, :msg_type))
+    msg_ies =
+      for type <- msg_types, into: %{} do
+        {type, ASN.CDB.S1X2.message_ies(x2ap, type)}
+      end
+    assert [
+      %{id: :"id-Cause", criticality: :ignore, type: :Cause, presence: :mandatory}
+    ] = Map.fetch!(msg_ies, :ResetRequest)
   end
 
 end

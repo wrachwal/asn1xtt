@@ -54,9 +54,9 @@ defmodule AsnCdbTest do
     assert length(roots) == 81
   end
 
-  test "explore/2 -- S1AP" do
-    db = &S1AP.db/1
-    CDB.explore(db, :"S1AP-PDU")
-  end
+# test "explore/2 -- S1AP" do
+#   db = &S1AP.db/1
+#   CDB.explore(db, :"S1AP-PDU")
+# end
 
 end

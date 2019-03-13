@@ -20,7 +20,7 @@ defmodule ASN.CDB do
     |> explore_undef(db)
   end
 
-  defp explore_undef(%{__REF__: tref} = map, db) do
+  def explore_undef(%{__REF__: tref} = map, db) do
     case tref |> Enum.reject(&(scalar?(elem(&1, 0)) or elem(&1, 1) > 0)) |> Enum.map(&elem(&1, 0)) do
       [] ->
         map

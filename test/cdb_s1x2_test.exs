@@ -86,6 +86,14 @@ defmodule AsnCdbS1X2Test do
     ]
   end
 
+  def _catch_explore(map, db, type) do
+      IO.puts "- #{inspect type}"
+      ASN.CDB.explore(map, db, type)
+    catch kind, error ->
+      IO.inspect {kind, error, __STACKTRACE__}
+      map
+  end
+
   test "S1AP ies" do
     s1ap = &S1AP.db/1
     msg_types =
@@ -104,6 +112,16 @@ defmodule AsnCdbS1X2Test do
       %{id: :"id-Additional-GUTI", criticality: :ignore, type: :"Additional-GUTI", presence: :optional},
       %{id: :"id-UE-Usage-Type",   criticality: :ignore, type: :"UE-Usage-Type",   presence: :optional}
     ] = Map.fetch!(msg_ies, :RerouteNASRequest)
+    msg_ies
+    |> Map.values()
+    |> Enum.flat_map(& &1)
+    |> Enum.map(&Map.fetch!(&1, :type))
+    |> Enum.reject(&ASN.CDB.scalar?/1)
+    |> Enum.uniq()
+  #XXX give up deep explore of s1ap/x2ap :(
+  # |> IO.inspect(label: "IE-types")
+  # |> Enum.reduce(%{}, &_catch_explore(&2, s1ap, &1))
+  # |> ASN.CDB.explore_undef(s1ap)
   end
 
   test "X2AP ies" do

@@ -18,16 +18,22 @@ defmodule AsnCttTest do
     # 4 -> like 1, but not in :MODULE's :typeorval
     # 5 -> like 2, but not in :MODULE's :typeorval
     assert tuple_lists_lengths(RRC.db1(:__typedef__)) == {2419, 0, 0, 3, 0, 0}
+    assert tuple_lists_lengths(RRC.db0(:__typedef__)) == {2419, 0, 0, 3, 0, 0}
     assert tuple_lists_lengths(S1AP.db1(:__typedef__)) == {564, 63, 263, 3, 0, 540}
+    assert tuple_lists_lengths(S1AP.db0(:__typedef__)) == {564, 63, 263, 3, 0, 0}
     assert tuple_lists_lengths(X2AP.db1(:__typedef__)) == {664, 46, 376, 3, 0, 746}
+    assert tuple_lists_lengths(X2AP.db0(:__typedef__)) == {664, 46, 376, 3, 0, 0}
   end
 
   test "__classdef__ tuple lists lengths" do
     # 0 -> {:classdef, ...
     # 1 -> like 0, but not in :MODULE's :typeorval
     assert tuple_lists_lengths(RRC.db1(:__classdef__)) == {0, 2}
+    assert tuple_lists_lengths(RRC.db0(:__classdef__)) == {0, 2}
     assert tuple_lists_lengths(S1AP.db1(:__classdef__)) == {5, 2}
+    assert tuple_lists_lengths(S1AP.db0(:__classdef__)) == {5, 2}
     assert tuple_lists_lengths(X2AP.db1(:__classdef__)) == {5, 2}
+    assert tuple_lists_lengths(X2AP.db0(:__classdef__)) == {5, 2}
   end
 
   test "CTT.asn_type_kind/1" do
@@ -72,7 +78,7 @@ defmodule AsnCttTest do
   end
 
   test "ASN.CTT.asn_roots/1" do
-    assert CTT.asn_roots(&RRC.db1/1) == [
+    assert CTT.asn_roots(&RRC.db0/1) == [
       :"BCCH-BCH-Message", :"BCCH-BCH-Message-MBMS", :"BCCH-BCH-Message-MF", :"BCCH-BCH-Message-NB", :"BCCH-BCH-Message-TDD-NB", :"BCCH-DL-SCH-Message",
       :"BCCH-DL-SCH-Message-BR", :"BCCH-DL-SCH-Message-MBMS", :"BCCH-DL-SCH-Message-MF", :"BCCH-DL-SCH-Message-NB",
       :"DL-CCCH-Message", :"DL-CCCH-Message-MF", :"DL-CCCH-Message-NB", :"DL-DCCH-Message", :"DL-DCCH-Message-MF",
@@ -101,6 +107,7 @@ defmodule AsnCttTest do
       :"VarShortResumeMAC-Input-NB-r13", :"VarWLAN-MobilityConfig",
       :"VarWLAN-Status-r13"
     ] #XXX length = 81
+    assert CTT.asn_roots(&RRC.db0/1) == CTT.asn_roots(&RRC.db1/1)
   end
 
   test "__typedef__ and __valuedef__ are in order as in .asn" do
@@ -121,6 +128,8 @@ defmodule AsnCttTest do
         :"maxBandComb-r10"
       ]
   end
+
+  ### ------------------------------------------------------------------------
 
   test "search_field/3 - goal starting with root" do
     db = &RRC.db1/1

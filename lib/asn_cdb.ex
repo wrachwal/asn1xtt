@@ -126,6 +126,8 @@ defmodule ASN.CDB do
   end
   defp comp(map, _cont, extaddgroup(), _ts), do: map
   defp comp(map, _cont, :ExtensionAdditionGroupEnd, _ts), do: map
+  #XXX DB0
+  defp comp(map, _cont, extmark(), _ts), do: map
 
   defp field_type(extyperef(type: type), _ts), do: type
   defp field_type(sequence(), ts), do: ts_atom(ts)

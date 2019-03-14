@@ -20,6 +20,8 @@ defmodule ASN.CTT do
                       ComponentType: :comptype,
                       ExtensionAdditionGroup: :extaddgroup,
                       ObjectClassFieldType: :ocft,
+                      #XXX added to read DB0
+                      EXTENSIONMARK: :extmark,
                     } do
     Record.defrecord tag || rec, rec, asn1_records[rec]
   end
@@ -193,6 +195,8 @@ defmodule ASN.CTT do
   defp tref_comp(tref, comptype(typespec: spec)) do
     tref_typespec(tref, spec)
   end
+  #XXX DB0
+  defp tref_comp(tref, extmark()), do: tref
 
   defp inckey(map, key) do
     map |> Map.put_new(key, 0) |> update_in([key], &(&1 + 1))
@@ -307,6 +311,8 @@ defmodule ASN.CTT do
     do: search_field(db, spec, gl, [{en, textual_order(ei), prop(prop)} | pl], acc)
   defp search_comp(_db, extaddgroup(), _gl, _pl, acc), do: acc
   defp search_comp(_db, :ExtensionAdditionGroupEnd, _gl, _pl, acc), do: acc
+  #XXX DB0
+  defp search_comp(_db, extmark(), _gl, _pl, acc), do: acc
 
   defp prop(:mandatory), do: :mandatory
   defp prop(:OPTIONAL), do: :OPTIONAL

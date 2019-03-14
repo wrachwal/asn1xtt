@@ -10,7 +10,7 @@ defmodule AsnCdbTest do
   end
 
   test "explore/2 -- Dev" do
-    db = &Dev.db1/1
+    db = &Dev.db0/1
     CDB.explore(db, :Rec1)
     CDB.explore(db, :Rec2)
     CDB.explore(db, :Rec3)
@@ -18,7 +18,7 @@ defmodule AsnCdbTest do
   end
 
   test "explore/2 -- main RRC channels" do
-    db = &RRC.db1/1
+    db = &RRC.db0/1
     CDB.explore(db, :"BCCH-BCH-Message")
     CDB.explore(db, :"BCCH-DL-SCH-Message")
     CDB.explore(db, :"PCCH-Message")
@@ -29,7 +29,7 @@ defmodule AsnCdbTest do
   end
 
   test "explore/2 -- main RRC channels in one go" do
-    db = &RRC.db1/1
+    db = &RRC.db0/1
     CDB.explore(db, [
       :"BCCH-BCH-Message",
       :"BCCH-DL-SCH-Message",
@@ -42,7 +42,7 @@ defmodule AsnCdbTest do
   end
 
   test "explore/2 -- *all* RRC types in one go" do
-    db = &RRC.db1/1
+    db = &RRC.db0/1
     %{__REF__: tref} = CDB.explore(db, db.(:__typedef__) |> elem(0))
     roots =
       tref
@@ -55,7 +55,7 @@ defmodule AsnCdbTest do
   end
 
 # test "explore/2 -- S1AP" do
-#   db = &S1AP.db1/1
+#   db = &S1AP.db0/1
 #   CDB.explore(db, :"S1AP-PDU")
 # end
 

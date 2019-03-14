@@ -9,16 +9,14 @@ defmodule AsnCdbTest do
     CDB.scalar?(type)
   end
 
-  test "explore/2 -- Dev" do
-    db = &Dev.db0/1
+  defp explore_dev(db) do
     CDB.explore(db, :Rec1)
     CDB.explore(db, :Rec2)
     CDB.explore(db, :Rec3)
     CDB.explore(db, :Dim3)
   end
 
-  test "explore/2 -- main RRC channels" do
-    db = &RRC.db0/1
+  defp explore_rrc_main_channels(db) do
     CDB.explore(db, :"BCCH-BCH-Message")
     CDB.explore(db, :"BCCH-DL-SCH-Message")
     CDB.explore(db, :"PCCH-Message")
@@ -28,8 +26,7 @@ defmodule AsnCdbTest do
     CDB.explore(db, :"DL-DCCH-Message")
   end
 
-  test "explore/2 -- main RRC channels in one go" do
-    db = &RRC.db0/1
+  defp explore_rrc_in_one_go(db) do
     CDB.explore(db, [
       :"BCCH-BCH-Message",
       :"BCCH-DL-SCH-Message",
@@ -41,8 +38,7 @@ defmodule AsnCdbTest do
     ])
   end
 
-  test "explore/2 -- *all* RRC types in one go" do
-    db = &RRC.db0/1
+  defp explore_rrc_all_types(db) do
     %{__REF__: tref} = CDB.explore(db, db.(:__typedef__) |> elem(0))
     roots =
       tref
@@ -53,6 +49,18 @@ defmodule AsnCdbTest do
     # |> IO.inspect(limit: :infinity, label: "ROOTS")
     assert length(roots) == 81
   end
+
+  test "explore/2 -- Dev.db0", do: explore_dev(&Dev.db0/1)
+  test "explore/2 -- Dev.db1", do: explore_dev(&Dev.db1/1)
+
+  test "explore/2 -- RRC.db0 main channels", do: explore_rrc_main_channels(&RRC.db0/1)
+  test "explore/2 -- RRC.db1 main channels", do: explore_rrc_main_channels(&RRC.db1/1)
+
+  test "explore/2 -- RRC.db0 in one go", do: explore_rrc_in_one_go(&RRC.db0/1)
+  test "explore/2 -- RRC.db1 in one go", do: explore_rrc_in_one_go(&RRC.db1/1)
+
+  test "explore/2 -- RRC.db0 all types", do: explore_rrc_all_types(&RRC.db0/1)
+  test "explore/2 -- RRC.db1 all types", do: explore_rrc_all_types(&RRC.db1/1)
 
 # test "explore/2 -- S1AP" do
 #   db = &S1AP.db0/1

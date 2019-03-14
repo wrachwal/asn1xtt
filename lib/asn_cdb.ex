@@ -97,37 +97,45 @@ defmodule ASN.CDB do
   defp exp(map, {scalar, _}, _ts) when scalar in @scalar2, do: map
 
   defp exp_comps(map, cont, {comps, exts}, ts) do
-    map
+    {map, 1}
     |> comps_list(cont, comps, ts)
     |> comps_list(cont, exts, ts)
+    |> elem(0)
   end
   defp exp_comps(map, cont, comps, ts) do
-    comps_list(map, cont, comps, ts)
+    {map, 1}
+    |> comps_list(cont, comps, ts)
+    |> elem(0)
   end
 
-  defp comps_list(map, cont, [h | t], ts) do
-    map
+  defp comps_list(ctx, cont, [h | t], ts) do
+    ctx
     |> comp(cont, h, ts)
     |> comps_list(cont, t, ts)
   end
-  defp comps_list(map, _cont, [], _ts) do
-    map
+  defp comps_list(ctx, _cont, [], _ts) do
+    ctx
   end
 
-  defp comp(map, :SEQUENCE, comptype(name: en, typespec: type(def: type), prop: _prop, textual_order: ei), ts) do
+  defp comp({map, ei}, :SEQUENCE, comptype(name: en, typespec: type(def: type), prop: _prop, textual_order: :undefined), ts) do #DB0
     fts = [Atom.to_string(en) | ts]
     IO.puts "SEQUENCE #{inspect Enum.reverse(ts)} => #{inspect en} | #{ei} | #{inspect field_type(type, fts)}"
-    map |> exp(type, fts)
+    {exp(map, type, fts), ei + 1}
   end
-  defp comp(map, :CHOICE, comptype(name: en, typespec: type(def: type), prop: _prop, textual_order: :undefined), ts) do
+  defp comp({map, ei}, :SEQUENCE, comptype(name: en, typespec: type(def: type), prop: _prop, textual_order: ei), ts) do #DB1
+    fts = [Atom.to_string(en) | ts]
+    IO.puts "SEQUENCE #{inspect Enum.reverse(ts)} => #{inspect en} | #{ei} | #{inspect field_type(type, fts)}"
+    {exp(map, type, fts), ei + 1}
+  end
+  defp comp({map, _ei}, :CHOICE, comptype(name: en, typespec: type(def: type), prop: _prop, textual_order: :undefined), ts) do
     fts = [Atom.to_string(en) | ts]
     IO.puts "CHOICE #{inspect Enum.reverse(ts)} => #{inspect en} | #{inspect field_type(type, fts)}"
-    map |> exp(type, fts)
+    {exp(map, type, fts), nil}
   end
-  defp comp(map, _cont, extaddgroup(), _ts), do: map
-  defp comp(map, _cont, :ExtensionAdditionGroupEnd, _ts), do: map
+  defp comp(ctx, _cont, extaddgroup(), _ts), do: ctx
+  defp comp(ctx, _cont, :ExtensionAdditionGroupEnd, _ts), do: ctx
   #XXX DB0
-  defp comp(map, _cont, extmark(), _ts), do: map
+  defp comp(ctx, _cont, extmark(), _ts), do: ctx
 
   defp field_type(extyperef(type: type), _ts), do: type
   defp field_type(sequence(), ts), do: ts_atom(ts)

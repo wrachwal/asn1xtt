@@ -1,3 +1,4 @@
 *.hrl
 *.erl
 *.asn1db
+*.asn1db.0

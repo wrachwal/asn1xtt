@@ -17,9 +17,13 @@ defmodule RRC do
   require ASN.CTT
   require Record
 
-  @external_resource asn1db = Path.join(srcdir, "asn_rrc.asn1db")
-  # generate `db/1`
-  ASN.CTT.burn_asn1db(asn1db, :db)
+  @external_resource db0 = Path.join(srcdir, "asn_rrc.asn1db.0")
+  # generate `db0/1`
+  ASN.CTT.burn_asn1db(db0, :db0)
+
+  @external_resource db1 = Path.join(srcdir, "asn_rrc.asn1db")
+  # generate `db1/1`
+  ASN.CTT.burn_asn1db(db1, :db1)
   # summary
   |> Keyword.values()
   |> Enum.filter(&Record.is_record/1)

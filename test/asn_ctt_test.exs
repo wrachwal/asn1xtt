@@ -17,21 +17,21 @@ defmodule AsnCttTest do
     # 3 -> like 0, but not in :MODULE's :typeorval
     # 4 -> like 1, but not in :MODULE's :typeorval
     # 5 -> like 2, but not in :MODULE's :typeorval
-    assert tuple_lists_lengths(RRC.db(:__typedef__)) == {2419, 0, 0, 3, 0, 0}
-    assert tuple_lists_lengths(S1AP.db(:__typedef__)) == {564, 63, 263, 3, 0, 540}
-    assert tuple_lists_lengths(X2AP.db(:__typedef__)) == {664, 46, 376, 3, 0, 746}
+    assert tuple_lists_lengths(RRC.db1(:__typedef__)) == {2419, 0, 0, 3, 0, 0}
+    assert tuple_lists_lengths(S1AP.db1(:__typedef__)) == {564, 63, 263, 3, 0, 540}
+    assert tuple_lists_lengths(X2AP.db1(:__typedef__)) == {664, 46, 376, 3, 0, 746}
   end
 
   test "__classdef__ tuple lists lengths" do
     # 0 -> {:classdef, ...
     # 1 -> like 0, but not in :MODULE's :typeorval
-    assert tuple_lists_lengths(RRC.db(:__classdef__)) == {0, 2}
-    assert tuple_lists_lengths(S1AP.db(:__classdef__)) == {5, 2}
-    assert tuple_lists_lengths(X2AP.db(:__classdef__)) == {5, 2}
+    assert tuple_lists_lengths(RRC.db1(:__classdef__)) == {0, 2}
+    assert tuple_lists_lengths(S1AP.db1(:__classdef__)) == {5, 2}
+    assert tuple_lists_lengths(X2AP.db1(:__classdef__)) == {5, 2}
   end
 
   test "CTT.asn_type_kind/1" do
-    type_kind = CTT.asn_type_kind(&RRC.db/1)
+    type_kind = CTT.asn_type_kind(&RRC.db1/1)
     kind_used =
       type_kind
       |> Map.values
@@ -72,7 +72,7 @@ defmodule AsnCttTest do
   end
 
   test "ASN.CTT.asn_roots/1" do
-    assert CTT.asn_roots(&RRC.db/1) == [
+    assert CTT.asn_roots(&RRC.db1/1) == [
       :"BCCH-BCH-Message", :"BCCH-BCH-Message-MBMS", :"BCCH-BCH-Message-MF", :"BCCH-BCH-Message-NB", :"BCCH-BCH-Message-TDD-NB", :"BCCH-DL-SCH-Message",
       :"BCCH-DL-SCH-Message-BR", :"BCCH-DL-SCH-Message-MBMS", :"BCCH-DL-SCH-Message-MF", :"BCCH-DL-SCH-Message-NB",
       :"DL-CCCH-Message", :"DL-CCCH-Message-MF", :"DL-CCCH-Message-NB", :"DL-DCCH-Message", :"DL-DCCH-Message-MF",
@@ -104,7 +104,7 @@ defmodule AsnCttTest do
   end
 
   test "__typedef__ and __valuedef__ are in order as in .asn" do
-    assert (RRC.db(:__typedef__) |> elem(0) |> Enum.take(8))  == [
+    assert (RRC.db1(:__typedef__) |> elem(0) |> Enum.take(8))  == [
         :"BCCH-BCH-Message",
         :"BCCH-BCH-MessageType",
         :"BCCH-BCH-Message-MBMS",
@@ -114,7 +114,7 @@ defmodule AsnCttTest do
         :"BCCH-DL-SCH-Message-BR",
         :"BCCH-DL-SCH-MessageType-BR-r13",
       ]
-    assert Enum.take(RRC.db(:__valuedef__), 4) == [
+    assert Enum.take(RRC.db1(:__valuedef__), 4) == [
         :"maxAccessCat-1-r15",
         :"maxACDC-Cat-r13",
         :"maxAvailNarrowBands-r13",
@@ -123,21 +123,21 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 - goal starting with root" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:MasterInformationBlock), [:MasterInformationBlock, :"phich-Config"]) ==
       [{[],
         [{:"phich-Config", 2, :mandatory}]}]
   end
 
   test "search_field/3 - goal without root" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:MasterInformationBlock), [:"phich-Config"]) ==
       [{[],
         [{:"phich-Config", 2, :mandatory}]}]
   end
 
   test "search_field/3 - CHOICE field starting with root" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"BCCH-DL-SCH-Message", :systemInformationBlockType1]) ==
       [{[],
         [{:systemInformationBlockType1, :ALT, :mandatory},
@@ -146,7 +146,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 - CHOICE field without root" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:systemInformationBlockType1]) ==
       [{[],
         [{:systemInformationBlockType1, :ALT, :mandatory},
@@ -155,7 +155,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 - CHOICE field, given by type, without root" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:SystemInformationBlockType1]) ==
       [{[],
         [{:systemInformationBlockType1, :ALT, :mandatory},
@@ -164,7 +164,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 - field name, nested inside SEQUENCE OF" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"plmn-Identity"]) ==
       [{[],
         [{:"plmn-Identity", 1, :mandatory},
@@ -224,7 +224,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 - field given by type (ambiguous result), nested inside SEQUENCE OF" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:"BCCH-DL-SCH-Message"), [:"PLMN-Identity"]) ==
       [{[],
         [{:"plmn-Identity-r15", :ALT, :mandatory},
@@ -320,7 +320,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 -- :bucketSizeDuration, 3 final results (goals)" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert IO.inspect CTT.search_field(db, db.(:"DL-DCCH-Message"), [:RRCConnectionReconfiguration, :bucketSizeDuration]) ==
       [{[],
         [{:bucketSizeDuration, 3, :mandatory},
@@ -572,7 +572,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 -- :bucketSizeDuration, 2 final results (goals)" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:"DL-DCCH-Message"), [:"drb-ToAddModList", :bucketSizeDuration]) ==
       [{[],
         [{:bucketSizeDuration, 3, :mandatory},
@@ -633,7 +633,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 -- :bucketSizeDuration, 1 final result (goal)" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:"DL-DCCH-Message"), [:RRCConnectionReconfiguration, :"drb-ToAddModList", :bucketSizeDuration]) ==
       [{[],
         [{:bucketSizeDuration, 3, :mandatory},
@@ -665,7 +665,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 in types that have defines like BCCH-BCH-MessageType ::= MasterInformationBlock" do
-    db = &RRC.db/1
+    db = &RRC.db1/1
     assert CTT.search_field(db, db.(:"BCCH-BCH-Message"), [:"phich-Duration"]) ==
       [{[], # ----------------------- field  in record
         [{:"phich-Duration", 1, :mandatory},  # PHICH-Config
@@ -674,7 +674,7 @@ defmodule AsnCttTest do
   end
 
   test "search_field/3 in s1ap..." do
-    db = &S1AP.db/1
+    db = &S1AP.db1/1
     assert CTT.search_field(db, db.(:"S1AP-PDU"), [:"S1AP-PDU", :"e-RAB-ID"]) ==
       [{[:"e-RAB-ID"], []}] #FIXME
   end

@@ -2,7 +2,7 @@ defmodule AsnCdbS1X2Test do
   use ExUnit.Case
 
   test "S1AP elementary_procedures/2" do
-    s1ap = &S1AP.db/1
+    s1ap = &S1AP.db1/1
     assert s1ap
       |> ASN.CDB.S1X2.elementary_procedures(:"S1AP-ELEMENTARY-PROCEDURES")
       |> Enum.map(&Map.fetch!(&1, :msg_type)) == [
@@ -45,7 +45,7 @@ defmodule AsnCdbS1X2Test do
   end
 
   test "X2AP elementary_procedures/2" do
-    x2ap = &X2AP.db/1
+    x2ap = &X2AP.db1/1
     assert x2ap
       |> ASN.CDB.S1X2.elementary_procedures(:"X2AP-ELEMENTARY-PROCEDURES")
       |> Enum.map(&Map.fetch!(&1, :msg_type)) == [
@@ -95,7 +95,7 @@ defmodule AsnCdbS1X2Test do
   end
 
   test "S1AP ies" do
-    s1ap = &S1AP.db/1
+    s1ap = &S1AP.db1/1
     msg_types =
       s1ap
       |> ASN.CDB.S1X2.elementary_procedures(:"S1AP-ELEMENTARY-PROCEDURES")
@@ -125,7 +125,7 @@ defmodule AsnCdbS1X2Test do
   end
 
   test "X2AP ies" do
-    x2ap = &X2AP.db/1
+    x2ap = &X2AP.db1/1
     msg_types =
       x2ap
       |> ASN.CDB.S1X2.elementary_procedures(:"X2AP-ELEMENTARY-PROCEDURES")

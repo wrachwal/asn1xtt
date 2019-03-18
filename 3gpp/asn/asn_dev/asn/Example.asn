@@ -1,7 +1,7 @@
 Example DEFINITIONS AUTOMATIC TAGS ::=
 BEGIN
 
--- [3.6  Naming of Records in .hrl Files](http://erlang.org/doc/apps/asn1/asn1_getting_started.html#naming-of-records-in-.hrl-files)
+-- [3.6 Naming of Records in .hrl Files](http://erlang.org/doc/apps/asn1/asn1_getting_started.html#naming-of-records-in-.hrl-files)
 
 -- -record('Rec1_a_b',{c}).
 
@@ -58,5 +58,47 @@ Vec ::= SEQUENCE {
 }
 
 Telework ::= SEQUENCE OF WeekDay
+
+-- [3.9 ASN.1 Information Objects (X.681)](http://erlang.org/doc/apps/asn1/asn1_getting_started.html#macros)
+
+--  Information Object Class
+
+GENERAL-PROCEDURE ::= CLASS {
+    &Message,
+    &Reply          OPTIONAL,
+    &Error          OPTIONAL,
+    &id         PrintableString UNIQUE
+}
+WITH SYNTAX {
+    NEW MESSAGE     &Message
+    [REPLY          &Reply]
+    [ERROR          &Error]
+    ADDRESS         &id
+}
+
+-- Objects
+
+object1 GENERAL-PROCEDURE ::= {
+    NEW MESSAGE     PrintableString
+    ADDRESS         "home"
+}
+
+object2 GENERAL-PROCEDURE ::= {
+    NEW MESSAGE     INTEGER
+    ERROR           INTEGER
+    ADDRESS         "remote"
+}
+
+-- Object set
+
+GENERAL-PROCEDURES GENERAL-PROCEDURE ::= {
+    object1 | object2, ...}
+
+--
+
+StartMessage  ::= SEQUENCE {
+    msgId   GENERAL-PROCEDURE.&id       ({GENERAL-PROCEDURES}),
+    content GENERAL-PROCEDURE.&Message  ({GENERAL-PROCEDURES}{@msgId})
+}
 
 END

@@ -45,4 +45,17 @@ defmodule Dev do
         raise "#{inspect type} (#{Base.encode16(pdu)}) decode error: #{inspect reason}"
     end
   end
+
+  def encode(rec) when Record.is_record(rec) do
+    :asn_dev.encode(elem(rec, 0), rec)
+  end
+
+  def encode!(rec) when Record.is_record(rec) do
+    case encode(rec) do
+      {:ok, bin} ->
+        bin
+      {:error, reason} ->
+        raise "encode error: #{inspect reason}"
+    end
+  end
 end

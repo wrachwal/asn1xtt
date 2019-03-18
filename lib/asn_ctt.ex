@@ -9,6 +9,7 @@ defmodule ASN.CTT do
   for {rec, tag} <- %{module: nil,
                       typedef: nil,
                       classdef: nil,
+                      objectclass: nil,
                       valuedef: nil,
                       ptypedef: nil,
                       type: nil,
@@ -25,6 +26,44 @@ defmodule ASN.CTT do
                     } do
     Record.defrecord tag || rec, rec, asn1_records[rec]
   end
+
+  # {typefield,Name,OptOrMand}
+  # {typefield,Name,Prop}
+  Record.defrecord :typefield, [:name, :opt_or_mand]
+
+  # {fixedtypevaluefield,Name,RefType,Unique,OSpec}
+  Record.defrecord :fixedtypevaluefield, [:name, :reftype, :unique, :ospec]
+
+  # {'WITH SYNTAX',SyntaxList}
+  Record.defrecord :with_syntax, :"WITH SYNTAX", [:syntax_list]
+
+  # {typefieldreference,FieldName}
+  Record.defrecord :typefieldreference, [:field_name]
+
+  # {valuefieldreference,FieldName}
+  Record.defrecord :valuefieldreference, [:field_name]
+
+  # {object,defaultsyntax,Fields}
+  # {object,definedsyntax,Fields}
+  #Record.defrecord :object, [syntax: nil, fields: []]
+
+  # {word_or_setting,Pos,tref2Exttref(Pos,Name)
+  Record.defrecord :word_or_setting, [:pos, :exttref]
+
+  Record.defrecord :element_set, [:a, :b]
+
+  # {union,A,B}
+  Record.defrecord :union, [:a, :b]
+
+  # {'SingleValue',Sv}
+  Record.defrecord :singleval, :SingleValue, [:sv]
+
+  # {simpletable,ObjectSet}
+  Record.defrecord :simpletable, [:objset]
+
+  Record.defrecord :componentrelation, [:objset, :constraint]
+
+  #Record.defrecord :objectset, [:pos, :extyperef]
 
   # --------------------------------------------------------------------------
 

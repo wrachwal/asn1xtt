@@ -1,1 +1,3 @@
-%{"asn1ex": {:git, "https://github.com/vicentfg/asn1ex.git", "0255348e2fffbdfd1eef7b46f71dc733318a36a0", []}}
+%{
+  "asn1ex": {:git, "https://github.com/wrachwal/asn1ex.git", "79085eb2131e4acfe001a6d43a693f058739b6a7", []},
+}

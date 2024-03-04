@@ -5,7 +5,7 @@ defmodule Asn1xtt.Mixfile do
     [
       app: :asn1xtt,
       version: "0.1.0",
-      elixir: "~> 1.5-dev",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env),
       start_permanent: Mix.env == :prod,
       deps: deps()
@@ -22,7 +22,7 @@ defmodule Asn1xtt.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, {:asn1, :optional}]
     ]
   end
 

@@ -11,6 +11,6 @@ defmodule ASN.X2AP.Mixfile do
   end
 
   defp deps do
-    [{:asn1ex, git: "https://github.com/vicentfg/asn1ex.git"}]
+    [{:asn1ex, git: "https://github.com/wrachwal/asn1ex.git"}]
   end
 end

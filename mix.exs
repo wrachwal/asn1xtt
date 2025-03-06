@@ -5,15 +5,16 @@ defmodule Asn1xtt.Mixfile do
     [
       app: :asn1xtt,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.16",
       elixirc_paths: elixirc_paths(Mix.env),
+      prune_code_paths: false,
       start_permanent: Mix.env == :prod,
       deps: deps()
     ]
   end
 
   defp elixirc_paths(env) when env in [:dev, :test] do
-    ["3gpp/lib", "lib"]
+    ["3gpp/lib", "lib", "test"]
   end
   defp elixirc_paths(_env) do
     ["lib"]

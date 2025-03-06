@@ -8,9 +8,9 @@ defmodule ASN.CTT do
 
   for {rec, tag} <- %{module: nil,
                       typedef: nil,
-                      classdef: nil,
                       valuedef: nil,
                       ptypedef: nil,
+                      classdef: nil,
                       type: nil,
                       SEQUENCE: :sequence,
                       Object: :object,
@@ -18,6 +18,7 @@ defmodule ASN.CTT do
                       Externaltypereference: :extyperef,
                       ComponentType: :comptype,
                       ExtensionAdditionGroup: :extaddgroup,
+                      state: nil, # :asn1ct.parse_and_save/2
                     } do
     Record.defrecord tag || rec, rec, asn1_records[rec]
   end
@@ -105,6 +106,9 @@ defmodule ASN.CTT do
 
   # --------------------------------------------------------------------------
 
+  @doc """
+  Burn all record definitions from given erlang header (.hrl) file.
+  """
   defmacro burn_record(asn1hrl) do
     quote bind_quoted: [asn1hrl: asn1hrl] do
       require Record

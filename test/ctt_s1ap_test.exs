@@ -6,23 +6,18 @@ defmodule AsnCttS1apTest do
   # --------------------------------------------------------------------------
 
   @asn_s1ap :asn_s1ap
-  @s1ap_asn_dir Path.expand("../3gpp/asn/asn_s1ap/asn", __DIR__)
   @s1ap_set_asn1 Path.expand("../3gpp/asn/asn_s1ap/asn1/asn_s1ap.set.asn1", __DIR__)
-
-  @s1ap_modules File.read!(@s1ap_set_asn1)
-  |> String.split("\n")
-  |> Enum.map(&String.trim/1)
-  |> Enum.reject(&(Regex.match?(~r/^#/, &1) or &1 == "")) # comment or blank line
-  |> Enum.map(&String.to_atom(Path.basename(&1, ".asn")))
+  @s1ap_modules_and_dirs Test.Asn1db.asn1_modules_and_dirs(@s1ap_set_asn1)
 
   test "merge all parsed modules of the protocol into single database" do
     outdir = String.to_charlist(__DIR__) # test/
-    includes = [String.to_charlist(@s1ap_asn_dir)]
+    {modules, includes} = @s1ap_modules_and_dirs
+    includes = Enum.map(includes, &String.to_charlist/1)
     options = for dir <- includes, do: {:i, dir}
     assert :ok = :asn1_db.dbstart(includes)
     db = :ets.new(@asn_s1ap, [])
     # iterate: parse, save, load, and merge
-    Enum.each(@s1ap_modules, fn module ->
+    Enum.each(modules, fn module ->
       state = CTT.state(
                 module: module,
                 erule: :per,

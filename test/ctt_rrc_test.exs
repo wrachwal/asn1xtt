@@ -52,30 +52,23 @@ defmodule AsnCttRrcTest do
   # ===
 
   @asn_rrc :asn_rrc
-  @rrc_asn_dir Path.expand("../3gpp/asn/asn_rrc/asn", __DIR__)
   @rrc_set_asn1 Path.expand("../3gpp/asn/asn_rrc/asn1/asn_rrc.set.asn1", __DIR__)
-
-  @rrc_modules File.read!(@rrc_set_asn1)
-  |> String.split("\n")
-  |> Enum.map(&String.trim/1)
-  |> Enum.reject(&(Regex.match?(~r/^#/, &1) or &1 == "")) # comment or blank line
-  |> Enum.map(&String.to_atom(Path.basename(&1, ".asn")))
-
-  @eutra_rrc_definitions :"EUTRA-RRC-Definitions"
+  @rrc_modules_and_dirs Test.Asn1db.asn1_modules_and_dirs(@rrc_set_asn1)
 
   test ":asn1ct.parse_and_save/2 - single module" do
     outdir = String.to_charlist(__DIR__) # test/
-    includes = [String.to_charlist(@rrc_asn_dir)]
-    options = for dir <- includes, do: {:i, dir}
-    module = @eutra_rrc_definitions
+    {modules, includes} = @rrc_modules_and_dirs
+    includes = Enum.map(includes, &String.to_charlist/1)
+    dirs = [outdir | includes]
+    module = hd(modules)
     state = CTT.state(
       module: module,          # probably ignored
       erule: :uper,            # will  be stored in __version_and_erule__ record
       # sourcedir: outdir,
-      options: [:uper, {:outdir, outdir} | options] # cannot have :maps option(!)
+      options: [:uper, {:outdir, outdir} | for(i <- includes, do: {:i, i})] # cannot have :maps option(!)
     )
 
-    assert :ok = :asn1_db.dbstart(includes)
+    assert :ok = :asn1_db.dbstart(dirs)
     assert :ok = :asn1ct.parse_and_save(module, state)
 
     asn1db = Path.join(outdir, Atom.to_string(module) <> ".asn1db")
@@ -83,27 +76,41 @@ defmodule AsnCttRrcTest do
     assert CTT.module() = :asn1_db.dbget(module, :MODULE)            # call
   end
 
-  test "merge all parsed modules of the protocol into single database" do
+  test "parse all modules (if needed) then merge into single database" do
     outdir = String.to_charlist(__DIR__) # test/
-    includes = [String.to_charlist(@rrc_asn_dir)]
-    options = for dir <- includes, do: {:i, dir}
-    assert :ok = :asn1_db.dbstart(includes)
+    {modules, includes} = @rrc_modules_and_dirs
+    includes = Enum.map(includes, &String.to_charlist/1)
+    dirs = [outdir | includes]
+    assert :ok = :asn1_db.dbstart(dirs)
     db = :ets.new(@asn_rrc, [])
+    erule = :uper
     # iterate: parse, save, load, and merge
-    Enum.each(@rrc_modules, fn module ->
-      state = CTT.state(
-                module: module,
-                erule: :uper,
-                options: [:uper, {:outdir, outdir} | options] # cannot have :maps option(!)
-              )
-      # parse
-      assert :ok = :asn1ct.parse_and_save(module, state)
-      # save
-      asn1db = Path.join(outdir, Atom.to_string(module) <> ".asn1db")
-      assert :ok = :asn1_db.dbsave(String.to_charlist(asn1db), module) # cast
-      assert CTT.module() = :asn1_db.dbget(module, :MODULE)            # call
-      # load
-      assert {:ok, tab} = :ets.file2tab(String.to_charlist(asn1db))
+    Enum.each(modules, fn module ->
+      assert {:ok, asn1spec} = Test.Asn1db.path_find(dirs, module, [".asn1", ".asn"])
+      spec_mtime = :filelib.last_modified(asn1spec)
+      assert is_tuple(spec_mtime)
+      {:ok, tab} =
+        # quick load without parse/save?
+        case :asn1_db.dbload(module, erule, false, spec_mtime) do
+          :ok ->
+            assert {:ok, asn1db} = Test.Asn1db.path_find(dirs, module, [".asn1db"])
+            # load
+            assert {:ok, _tab} = :ets.file2tab(String.to_charlist(asn1db))
+          :error ->
+            state = CTT.state(
+                      module: module,
+                      erule: erule,
+                      options: [erule, {:outdir, outdir} | for(i <- includes, do: {:i, i})] # cannot have :maps option(!)
+                    )
+            # parse
+            assert :ok = :asn1ct.parse_and_save(module, state)
+            # save
+            asn1db = Path.join(outdir, Atom.to_string(module) <> ".asn1db")
+            assert :ok = :asn1_db.dbsave(String.to_charlist(asn1db), module) # cast
+            assert CTT.module() = :asn1_db.dbget(module, :MODULE)            # call
+            # load
+            assert {:ok, _tab} = :ets.file2tab(String.to_charlist(asn1db))
+        end
       # merge
       acc = %{
         table: db,
@@ -183,6 +190,28 @@ defmodule AsnCttRrcTest do
 
   defp log_merge_error(key, old, new) do
     Logger.error(["* cannot merge #{inspect key} old ", inspect(old), " with new ", inspect(new)])
+  end
+
+  test ":asn1ct.dbload/4 - use to query if parse/save is needed" do
+    outdir = String.to_charlist(__DIR__) # test/
+    {modules, includes} = @rrc_modules_and_dirs
+    includes = Enum.map(includes, &String.to_charlist/1)
+
+    dirs = [outdir | includes]  # outdir is required for .asn1db to be found
+    assert :ok = :asn1_db.dbstart(dirs)
+
+    module = hd(modules)
+    assert {:ok, asn1spec} = Test.Asn1db.path_find(dirs, module, [".asn1", ".asn"])
+    assert File.exists?(asn1spec)
+    spec_mtime = :filelib.last_modified(asn1spec)
+    assert is_tuple(spec_mtime)
+
+    case Test.Asn1db.path_find(dirs, module, [".asn1db"]) do
+      {:ok, _asn1db} ->
+        assert :ok = :asn1_db.dbload(module, :uper, false, spec_mtime)
+      :error ->
+        assert :error = :asn1_db.dbload(module, :uper, false, spec_mtime)
+    end
   end
 
 end

@@ -1,5 +1,6 @@
 defmodule AsnCttS1apTest do
   use ExUnit.Case
+  require Test.Asn1db
   require ASN.CTT, as: CTT
   require Logger
 
@@ -145,6 +146,16 @@ defmodule AsnCttS1apTest do
       # true ->
       #   acc
     end
+  end
+
+  # --------------------------------------------------------------------------
+
+  test "insert_asn1db/4" do
+    outdir = String.to_charlist(__DIR__) # test/
+    tab = :ets.new(:asn_rrc, [])
+    assert :ok = Test.Asn1db.insert_asn1db(tab, @s1ap_set_asn1, outdir, :uper)
+    assert Test.Asn1db.__asn1set__(modules: modules) = :ets.lookup_element(tab, :__asn1set__, 2)
+    assert [_ | _] = modules # |> IO.inspect()
   end
 
 end

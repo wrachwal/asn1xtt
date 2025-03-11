@@ -1,5 +1,6 @@
 defmodule AsnCttRrcTest do
   use ExUnit.Case
+  require Test.Asn1db
   require ASN.CTT, as: CTT
   require Logger
 
@@ -192,6 +193,8 @@ defmodule AsnCttRrcTest do
     Logger.error(["* cannot merge #{inspect key} old ", inspect(old), " with new ", inspect(new)])
   end
 
+  # --------------------------------------------------------------------------
+
   test ":asn1ct.dbload/4 - use to query if parse/save is needed" do
     outdir = String.to_charlist(__DIR__) # test/
     {modules, includes} = @rrc_modules_and_dirs
@@ -212,6 +215,14 @@ defmodule AsnCttRrcTest do
       :error ->
         assert :error = :asn1_db.dbload(module, :uper, false, spec_mtime)
     end
+  end
+
+  test "insert_asn1db/4" do
+    outdir = String.to_charlist(__DIR__) # test/
+    tab = :ets.new(:asn_rrc, [])
+    assert :ok = Test.Asn1db.insert_asn1db(tab, @rrc_set_asn1, outdir, :uper)
+    assert Test.Asn1db.__asn1set__(modules: modules) = :ets.lookup_element(tab, :__asn1set__, 2)
+    assert [_ | _] = modules # |> IO.inspect()
   end
 
 end

@@ -23,6 +23,28 @@ defmodule Test.Asn1db do
 
   # --------------------------------------------------------------------------
 
+  @spec asn1db_map(asn1_module(), Path.t(), Path.t(), erule()) :: map()
+  def asn1db_map(name, multi_asn1, outdir, erule) do
+    tid = :ets.new(name, [])
+    try do
+      :ok = insert_asn1db(tid, multi_asn1, outdir, erule)
+      asn1db_map(tid)
+    after
+      :ets.delete(tid)
+    end
+  end
+
+  @spec asn1db_map(:ets.tid()) :: map()
+  def asn1db_map(tid) do
+    __asn1set__() = :ets.lookup_element(tid, @asn1set, 2) # assertion
+    reduce = fn {key, val}, acc ->
+      Map.put(acc, key, val)
+    end
+    :ets.foldl(reduce, %{}, tid)
+  end
+
+  # --------------------------------------------------------------------------
+
   @spec insert_asn1db(:ets.tid(), Path.t(), Path.t(), erule()) :: :ok
   def insert_asn1db(tid, multi_or_single_asn1, outdir, erule) when is_atom(erule) do
     outdir = outdir |> IO.chardata_to_string() |> String.to_charlist()

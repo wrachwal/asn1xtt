@@ -4,6 +4,11 @@ defmodule AsnCttRrcTest do
   require ASN.CTT, as: CTT
   require Logger
 
+  setup_all do
+    outdir = Path.expand("asn1db", __DIR__) |> String.to_charlist() # test/asn1db/
+    {:ok, outdir: outdir}
+  end
+
   # --------------------------------------------------------------------------
 
   defp has_underscore?(atom) do
@@ -14,16 +19,16 @@ defmodule AsnCttRrcTest do
     assert [_ | _] = records = RRC.ASN.record()
     assert [_ | _] = asn1_records = Enum.reject(records, &has_underscore?/1)
     assert [_ | _] = anon_records = Enum.filter(records, &has_underscore?/1)
-    assert length(asn1_records) == 1108
-    assert length(anon_records) == 546
+    assert length(asn1_records) == 1902
+    assert length(anon_records) == 760
   end
 
   # rg -U "\{\n\}" 3gpp/asn/asn_rrc/src/asn_rrc.hrl | wc -l  #=> 368
   test "about 10% of records are empty! (SEQUENCE {})" do
     assert [_ | _] = records = RRC.ASN.record()
     assert [_ | _] = empty_records = Enum.filter(records, &(RRC.ASN.rec2kv(&1) == []))
-    assert length(records) == 1654
-    assert length(empty_records) == 184
+    assert length(records) == 2662
+    assert length(empty_records) == 222
   end
 
   test "explicit records found in database" do
@@ -56,8 +61,7 @@ defmodule AsnCttRrcTest do
   @rrc_set_asn1 Path.expand("../3gpp/asn/asn_rrc/asn1/asn_rrc.set.asn1", __DIR__)
   @rrc_modules_and_dirs Test.Asn1db.asn1_modules_and_dirs(@rrc_set_asn1)
 
-  test ":asn1ct.parse_and_save/2 - single module" do
-    outdir = String.to_charlist(__DIR__) # test/
+  test ":asn1ct.parse_and_save/2 - single module", %{outdir: outdir} do
     {modules, includes} = @rrc_modules_and_dirs
     includes = Enum.map(includes, &String.to_charlist/1)
     dirs = [outdir | includes]
@@ -77,8 +81,7 @@ defmodule AsnCttRrcTest do
     assert CTT.module() = :asn1_db.dbget(module, :MODULE)            # call
   end
 
-  test "parse all modules (if needed) then merge into single database" do
-    outdir = String.to_charlist(__DIR__) # test/
+  test "parse all modules (if needed) then merge into single database", %{outdir: outdir} do
     {modules, includes} = @rrc_modules_and_dirs
     includes = Enum.map(includes, &String.to_charlist/1)
     dirs = [outdir | includes]
@@ -195,8 +198,7 @@ defmodule AsnCttRrcTest do
 
   # --------------------------------------------------------------------------
 
-  test ":asn1ct.dbload/4 - use to query if parse/save is needed" do
-    outdir = String.to_charlist(__DIR__) # test/
+  test ":asn1ct.dbload/4 - use to query if parse/save is needed", %{outdir: outdir} do
     {modules, includes} = @rrc_modules_and_dirs
     includes = Enum.map(includes, &String.to_charlist/1)
 
@@ -217,8 +219,7 @@ defmodule AsnCttRrcTest do
     end
   end
 
-  test "insert_asn1db/4" do
-    outdir = String.to_charlist(__DIR__) # test/
+  test "insert_asn1db/4", %{outdir: outdir} do
     tab = :ets.new(:asn_rrc, [])
     assert :ok = Test.Asn1db.insert_asn1db(tab, @rrc_set_asn1, outdir, :uper)
     assert Test.Asn1db.__asn1set__(modules: modules) = :ets.lookup_element(tab, :__asn1set__, 2)

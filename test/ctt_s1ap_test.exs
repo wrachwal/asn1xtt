@@ -4,14 +4,18 @@ defmodule AsnCttS1apTest do
   require ASN.CTT, as: CTT
   require Logger
 
+  setup_all do
+    outdir = Path.expand("asn1db", __DIR__) |> String.to_charlist() # test/asn1db/
+    {:ok, outdir: outdir}
+  end
+
   # --------------------------------------------------------------------------
 
   @asn_s1ap :asn_s1ap
   @s1ap_set_asn1 Path.expand("../3gpp/asn/asn_s1ap/asn1/asn_s1ap.set.asn1", __DIR__)
   @s1ap_modules_and_dirs Test.Asn1db.asn1_modules_and_dirs(@s1ap_set_asn1)
 
-  test "merge all parsed modules of the protocol into single database" do
-    outdir = String.to_charlist(__DIR__) # test/
+  test "merge all parsed modules of the protocol into single database", %{outdir: outdir} do
     {modules, includes} = @s1ap_modules_and_dirs
     includes = Enum.map(includes, &String.to_charlist/1)
     options = for dir <- includes, do: {:i, dir}
@@ -150,8 +154,7 @@ defmodule AsnCttS1apTest do
 
   # --------------------------------------------------------------------------
 
-  test "insert_asn1db/4" do
-    outdir = String.to_charlist(__DIR__) # test/
+  test "insert_asn1db/4", %{outdir: outdir} do
     tab = :ets.new(:asn_rrc, [])
     assert :ok = Test.Asn1db.insert_asn1db(tab, @s1ap_set_asn1, outdir, :uper)
     assert Test.Asn1db.__asn1set__(modules: modules) = :ets.lookup_element(tab, :__asn1set__, 2)

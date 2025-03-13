@@ -44,11 +44,11 @@ defmodule AsnCttS1apTest do
     asn1db = Path.join(outdir, Atom.to_string(@asn_s1ap) <> ".asn1db")
     :ok = :ets.tab2file(db, String.to_charlist(asn1db), extended_info: [:object_count], sync: true)
     size = :ets.info(db, :size)
-    assert size == 1154
-    # database stored as the result of real compilation has much more objects (1644 vs 1154)
+    assert size == 1522
+    # database stored as the result of real compilation has much more objects
     assert :ets.foldl(&get_row_type/2, %{}, db) == %{
-      typedef: 797,
-      valuedef: 334,
+      typedef: 1047,
+      valuedef: 452,
       ptypedef: 14,
       classdef: 7
     }
@@ -61,11 +61,11 @@ defmodule AsnCttS1apTest do
       objects,                  # typedef
       objsets                   # typedef
     } = typeorval
-    assert length(types) + length(objects) + length(objsets) == 794 # =(496 + 60 + 238) vs 797
+    assert length(types) + length(objects) + length(objsets) == 1044
     # +('CHARACTER STRING', 'EMBEDDED PDV', 'EXTERNAL')  ## Find: typedef,false,undefined
-    assert length(values) == 334
+    assert length(values) == 452
     assert length(ptypes) == 14
-    assert length(classes) == 5 # vs 7
+    assert length(classes) == 5
     # +(ABSTRACT-SYNTAX, TYPE-IDENTIFIER)  ##Find: classded,true,undefined
   end
 

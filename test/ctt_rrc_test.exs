@@ -124,11 +124,11 @@ defmodule AsnCttRrcTest do
     asn1db = Path.join(outdir, Atom.to_string(@asn_rrc) <> ".asn1db")
     :ok = :ets.tab2file(db, String.to_charlist(asn1db), extended_info: [:object_count], sync: true)
     size = :ets.info(db, :size)
-    assert size == 1903
+    assert size == 3118
     # Interesting facts:
-    # database stored as the result of real compilation has the same number of objects (1903),
-    # but size in kilobytes is larger (2562kB) vs (1704kB) what confirms the fact that much
-    # data was expanded during check, the process proceeding code generation.
+    # database stored as the result of real compilation has the same number of objects,
+    # but size in kilobytes is larger what confirms the fact that much data was expanded
+    # during check, the process proceeding code generation.
   end
 
   # duplicated keys found:

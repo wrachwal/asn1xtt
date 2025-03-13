@@ -1,0 +1,18 @@
+-- https://www.erlang.org/doc/apps/asn1/asn1_getting_started.html#sequence
+
+File DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+Seq1 ::= SEQUENCE {
+    a INTEGER DEFAULT 1,
+    b Seq2 DEFAULT {aa TRUE, bb 15}
+}
+
+Seq2 ::= SEQUENCE {
+    aa BOOLEAN,
+    bb INTEGER
+}
+
+Seq3 ::= SEQUENCE {
+    bs BIT STRING {a(0), b(1), c(2)} DEFAULT {a, c}
+}
+END

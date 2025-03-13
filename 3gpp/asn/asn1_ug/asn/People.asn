@@ -1,0 +1,10 @@
+-- https://www.erlang.org/doc/apps/asn1/asn1_getting_started.html#example
+
+People DEFINITIONS AUTOMATIC TAGS ::=
+BEGIN
+  Person ::= SEQUENCE {
+    name PrintableString,
+    location INTEGER {home(0),field(1),roving(2)},
+    age INTEGER OPTIONAL
+  }
+END

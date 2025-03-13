@@ -20,8 +20,8 @@ defmodule S1AP do
 
   def decode!(pdu, type \\ :"S1AP-PDU") when is_binary(pdu) do
     case decode(pdu, type) do
-      {:ok, rrc} ->
-        rrc
+      {:ok, data} ->
+        data
       {:error, reason} ->
         raise "#{inspect type} (#{Base.encode16(pdu)}) decode error: #{inspect reason}"
     end

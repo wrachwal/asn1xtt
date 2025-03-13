@@ -1,0 +1,107 @@
+-- https://www.erlang.org/doc/apps/asn1/asn1_getting_started.html#embedded-named-types
+
+EmbeddedExample DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+B ::= SEQUENCE {
+        a Arr1,
+        b T }
+
+Arr1 ::= SET SIZE (5) OF INTEGER (4..9)
+
+T ::= CHOICE {
+        x REAL,
+        y INTEGER,
+        z OBJECT IDENTIFIER }
+
+-- 1> 'EmbeddedExample':encode('B', {'B',[4,5,6,7,8],{x,"7.77"}}).
+-- {ok,<<5,56,0,8,3,55,55,55,46,69,45,50>>}
+
+-- https://www.erlang.org/doc/apps/asn1/asn1_getting_started.html#embedded-structured-types
+
+Emb ::= SEQUENCE {
+    a SEQUENCE OF OCTET STRING,
+    b SET {
+       a INTEGER,
+       b INTEGER DEFAULT 66},
+    c CHOICE {
+       a INTEGER,
+       b FooType } }
+
+FooType ::= [3] VisibleString
+
+-- -record('Emb,{a, b, c}).
+-- -record('Emb_b',{a, b = asn1_DEFAULT}). % the embedded SET type
+
+-- V = #'Emb'{a=["qqqq",[1,2,255]],
+--            b = #'Emb_b'{a=99},
+--            c ={b,"Can you see this"}}.
+
+-- #==========================================================================
+
+/* For an embedded type of type SEQUENCE/SET in a SEQUENCE/SET,
+   the record name is extended with an underscore and the component name.
+   If the embedded structure is deeper with the SEQUENCE, SET, or CHOICE types in the line,
+   each component name/alternative name is added to the record name.
+*/
+
+SeqX ::= SEQUENCE{  -- WAS: Seq
+    a CHOICE{
+        b SEQUENCE {
+           c  INTEGER
+        }
+    }
+}
+
+-- -record('SeqX_a_b',{c}).
+
+-- #--------------------------------------------------------------------------
+
+/* If the structured type has a component with an embedded SEQUENCE OF/SET OF
+   which embedded type in turn is a SEQUENCE/SET,
+   it gives a record with the SEQUENCE OF/SET OF addition as in the following example:
+*/
+
+SeqY ::= SEQUENCE {  -- WAS: Seq
+    a SEQUENCE OF SEQUENCE {
+           b INTEGER
+               },
+    c SET OF SEQUENCE {
+           d INTEGER
+               }
+}
+
+-- -record('SeqY_a_SEQOF'{b}).
+-- -record('SeqY_c_SETOF'{d}).
+
+-- #--------------------------------------------------------------------------
+
+/* A parameterized type is to be considered as an embedded type.
+   Each time such a type is referenced, an instance of it is defined.
+   Thus, in the following example a record with name 'SeqP_b' is generated
+   in the .hrl file and is used to hold values:
+*/
+
+SeqP ::= SEQUENCE {  -- WAS: Seq
+    b PType{INTEGER}
+}
+
+PType{T} ::= SEQUENCE{
+    id T
+}
+
+-- #--------------------------------------------------------------------------
+
+-- https://www.erlang.org/doc/apps/asn1/asn1_getting_started.html#recursive-types
+
+Rec ::= CHOICE {
+     nothing NULL,
+     something SEQUENCE {
+          a INTEGER,
+          b OCTET STRING,
+          c Rec }}
+
+-- V = {something,#'Rec_something'{a = 77,
+--                                 b = "some octets here",
+--                                 c = {nothing,'NULL'}}}.
+
+END

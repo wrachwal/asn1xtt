@@ -1,24 +1,24 @@
-srcdir = Path.join(__DIR__, "../asn/asn_x2ap/src")
+srcdir = Path.join(__DIR__, "../asn/asn1_ug/src")
 
-defmodule X2AP do
+defmodule Asn1UG do
   require ASN.CTT
   require Record
 
   # generate `db/1`
-  ASN.CTT.burn_asn1db(Path.join(srcdir, "asn_x2ap.asn1db"), :db)
+  ASN.CTT.burn_asn1db(Path.join(srcdir, "asn1_ug.asn1db"), :db)
   # summary
   |> Keyword.values()
   |> Enum.filter(&Record.is_record/1)
   |> Enum.map(&elem(&1, 0))
   |> Enum.reduce(%{}, fn rec, map -> map |> Map.put_new(rec, 0) |> update_in([rec], &(&1 + 1)) end)
   |> Enum.sort()
-  |> Enum.each(fn {t, c} -> IO.puts("# X2AP/#{t} = #{c}") end)
+  |> Enum.each(fn {t, c} -> IO.puts("# Asn1UG/#{t} = #{c}") end)
 
-  def decode(pdu, type \\ :"X2AP-PDU") when is_binary(pdu) do
-    :asn_x2ap.decode(type, pdu)
+  def decode(pdu, type) when is_binary(pdu) and is_atom(type) do
+    :asn1_ug.decode(type, pdu)
   end
 
-  def decode!(pdu, type \\ :"X2AP-PDU") when is_binary(pdu) do
+  def decode!(pdu, type) when is_binary(pdu) and is_atom(type) do
     case decode(pdu, type) do
       {:ok, data} ->
         data

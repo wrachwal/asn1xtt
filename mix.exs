@@ -31,6 +31,7 @@ defmodule Asn1xtt.Mixfile do
   defp deps do
     [{:asn_rrc,  path: "3gpp/asn/asn_rrc", only: [:dev, :test]},
      {:asn_s1ap,  path: "3gpp/asn/asn_s1ap", only: [:dev, :test]},
-     {:asn_x2ap,  path: "3gpp/asn/asn_x2ap", only: [:dev, :test]}]
+     {:asn_x2ap,  path: "3gpp/asn/asn_x2ap", only: [:dev, :test]},
+     {:asn1_ug,  path: "3gpp/asn/asn1_ug", only: [:dev, :test]}]
   end
 end

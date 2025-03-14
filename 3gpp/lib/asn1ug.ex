@@ -14,6 +14,10 @@ defmodule Asn1UG do
   |> Enum.sort()
   |> Enum.each(fn {t, c} -> IO.puts("# Asn1UG/#{t} = #{c}") end)
 
+  def encode(data, type) when is_atom(type) do
+    :asn1_ug.encode(type, data)
+  end
+
   def decode(pdu, type) when is_binary(pdu) and is_atom(type) do
     :asn1_ug.decode(type, pdu)
   end

@@ -11,9 +11,10 @@ BEGIN
 
 TT ::= SEQUENCE {
    a INTEGER,
-   b SET OF OCTET STRING }
+   b SET OF IA5String } -- WAS: OCTET STRING, changed due to reported error (below)
 
 tt TT ::= {a 77,b {"kalle","kula"}}
+--                 ^ error A0120E: Parsing error: expecting a bstring, or an hstring but found CSTRING.
 
 /* The value defined here can be used in several ways.
    It can, for example, be used as the value in some DEFAULT component:
